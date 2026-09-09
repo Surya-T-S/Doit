@@ -4,13 +4,12 @@ import {
   X,
   Check,
   Clock,
-  Sparkles,
+  Calendar as CalendarIcon,
 } from 'lucide-react';
 import {
   format,
   isToday as isTodayFn,
   isSameDay,
-  addDays,
   addWeeks,
   parseISO,
 } from 'date-fns';
@@ -21,6 +20,8 @@ import {
   getCalendarDays,
   getWeekDays,
   toDateStr,
+  getTodayStr,
+  getTomorrowStr,
   formatDate,
   formatTime,
   formatDuration,
@@ -28,18 +29,24 @@ import {
 } from '../../utils/dates';
 import type { Task } from '../../types';
 
-const QUICK_TIME_PRESETS = [
-  { label12: '9:00 AM', time: '09:00', emoji: '☀️', desc: 'Morning' },
-  { label12: '1:00 PM', time: '13:00', emoji: '🌤️', desc: 'Afternoon' },
-  { label12: '3:00 PM', time: '15:00', emoji: '☕', desc: 'Late Afternoon' },
-  { label12: '6:00 PM', time: '18:00', emoji: '🌙', desc: 'Evening' },
-  { label12: '9:00 PM', time: '21:00', emoji: '🌌', desc: 'Night' },
+const TIME_SELECTION_OPTIONS = [
+  { label12: '9:00 AM', time: '09:00' },
+  { label12: '12:00 PM', time: '12:00' },
+  { label12: '3:00 PM', time: '15:00' },
+  { label12: '6:00 PM', time: '18:00' },
+  { label12: '9:00 PM', time: '21:00' },
 ];
 
 export function CalendarView() {
-  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
-  const [quickTaskTitle, setQuickTaskTitle] = useState('');
-  const [quickTaskTime, setQuickTaskTime] = useState<string | null>(null);
+  // New Task Dialog State (Task Name, Description, Date, Time - all selection based)
+  const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
+  const [taskTitle, setTaskTitle] = useState('');
+  const [taskDescription, setTaskDescription] = useState('');
+  const [taskDueDate, setTaskDueDate] = useState<string>(getTodayStr());
+  const [taskDueTime, setTaskDueTime] = useState<string | null>(null);
+
+  // Optional: Day schedule popover when clicking "+X more"
+  const [viewingDayTasks, setViewingDayTasks] = useState<Date | null>(null);
 
   const tasks = useTaskStore((s) => s.tasks);
   const addTask = useTaskStore((s) => s.addTask);
@@ -52,15 +59,25 @@ export function CalendarView() {
   const year = calendarDate.getFullYear();
   const month = calendarDate.getMonth();
 
+  const openNewTaskModal = useCallback((date?: Date) => {
+    const targetDate = date || new Date();
+    setTaskDueDate(toDateStr(targetDate));
+    setTaskTitle('');
+    setTaskDescription('');
+    setTaskDueTime(null);
+    setIsNewTaskOpen(true);
+    setViewingDayTasks(null);
+  }, []);
+
   // Listen for external trigger to open calendar task creation modal (shortcut 'N' or header button)
   useEffect(() => {
     const handleOpenCreator = (e: Event) => {
       const customEvent = e as CustomEvent<{ date?: Date }>;
-      setSelectedDay(customEvent.detail?.date || new Date());
+      openNewTaskModal(customEvent.detail?.date);
     };
     window.addEventListener('open-calendar-new-task', handleOpenCreator);
     return () => window.removeEventListener('open-calendar-new-task', handleOpenCreator);
-  }, []);
+  }, [openNewTaskModal]);
 
   // Calendar month days
   const calendarDays = useMemo(
@@ -120,36 +137,48 @@ export function CalendarView() {
     [addTask, addToast, use24h]
   );
 
-  // Live natural language parser for minimal date & time input
-  const naturalDetected = useMemo(() => {
-    if (!quickTaskTitle.trim()) return null;
-    const parsed = parseNaturalDateTime(quickTaskTitle, selectedDay || new Date());
-    if (parsed.dueDate || parsed.dueTime) {
-      return parsed;
+  // Auto-detect date & time silently in background as user types title
+  const handleTitleChange = (val: string) => {
+    setTaskTitle(val);
+    if (val.trim()) {
+      const parsed = parseNaturalDateTime(val, parseISO(taskDueDate));
+      if (parsed.dueDate) {
+        setTaskDueDate(parsed.dueDate);
+      }
+      if (parsed.dueTime) {
+        setTaskDueTime(parsed.dueTime);
+      }
     }
-    return null;
-  }, [quickTaskTitle, selectedDay]);
-
-  const handleModalSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedDay || !quickTaskTitle.trim()) return;
-
-    const natural = parseNaturalDateTime(quickTaskTitle, selectedDay);
-    const finalTitle = (natural.detectedText ? natural.cleanTitle : quickTaskTitle).trim() || quickTaskTitle.trim();
-    const finalTime = quickTaskTime || natural.dueTime || null;
-    const finalDate = natural.dueDate ? parseISO(natural.dueDate) : selectedDay;
-
-    handleCreateTaskForDay(finalDate, finalTitle, finalTime);
-    setQuickTaskTitle('');
-    setQuickTaskTime(null);
   };
 
-  // Tasks for currently opened day modal
-  const selectedDayTasks = useMemo(() => {
-    if (!selectedDay) return [];
-    const str = toDateStr(selectedDay);
-    return tasksByDate[str] || [];
-  }, [selectedDay, tasksByDate]);
+  const handleCreateNewTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedTitle = taskTitle.trim();
+    if (!trimmedTitle) return;
+
+    const parsed = parseNaturalDateTime(trimmedTitle, parseISO(taskDueDate));
+    const finalTitle = (parsed.detectedText ? parsed.cleanTitle : trimmedTitle) || trimmedTitle;
+    const finalDate = taskDueDate || parsed.dueDate || getTodayStr();
+    const finalTime = taskDueTime || parsed.dueTime || null;
+
+    addTask(finalTitle, {
+      description: taskDescription.trim(),
+      dueDate: finalDate,
+      dueTime: finalTime,
+    });
+
+    const timeStr = finalTime ? ` at ${formatTime(finalTime, use24h)}` : '';
+    addToast({
+      message: `Task scheduled for ${formatDate(finalDate)}${timeStr}`,
+      type: 'success',
+      duration: 2500,
+    });
+
+    setIsNewTaskOpen(false);
+    setTaskTitle('');
+    setTaskDescription('');
+    setTaskDueTime(null);
+  };
 
   return (
     <div className="calendar-container">
@@ -181,7 +210,7 @@ export function CalendarView() {
                 className={`calendar-day${!isCurrentMonth ? ' outside-month' : ''}`}
                 role="gridcell"
                 aria-label={format(day, 'MMMM d, yyyy')}
-                onClick={() => setSelectedDay(day)}
+                onClick={() => openNewTaskModal(day)}
               >
                 <div className="calendar-day-header-row">
                   {isToday ? (
@@ -198,7 +227,7 @@ export function CalendarView() {
                     className="calendar-quick-add-btn"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setSelectedDay(day);
+                      openNewTaskModal(day);
                     }}
                     title={`Add task for ${format(day, 'MMM d')}`}
                   >
@@ -245,7 +274,7 @@ export function CalendarView() {
                       className="calendar-more-btn"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setSelectedDay(day);
+                        setViewingDayTasks(day);
                       }}
                     >
                       +{dayTasks.length - maxVisible} more
@@ -336,7 +365,7 @@ export function CalendarView() {
 
                   <button
                     className="calendar-week-quick-add"
-                    onClick={() => setSelectedDay(day)}
+                    onClick={() => openNewTaskModal(day)}
                   >
                     <Plus size={14} />
                     <span>Add task</span>
@@ -348,11 +377,193 @@ export function CalendarView() {
         </div>
       )}
 
-      {/* Google Calendar Day Dialog / Popover */}
-      {selectedDay && (
+      {/* Minimal New Task Modal — Only Task Name, Description, Date, Time (selection-based, matching theme, no emojis) */}
+      {isNewTaskOpen && (
         <div
           className="calendar-modal-overlay"
-          onClick={() => setSelectedDay(null)}
+          onClick={() => setIsNewTaskOpen(false)}
+        >
+          <div
+            className="new-task-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className="new-task-modal-header">
+              <h3 className="new-task-modal-title">New Task</h3>
+              <button
+                type="button"
+                className="calendar-modal-close"
+                onClick={() => setIsNewTaskOpen(false)}
+                aria-label="Close"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateNewTask} className="new-task-form">
+              <div className="new-task-form-body">
+                {/* 1. Task Name */}
+                <div className="new-task-field">
+                  <label className="new-task-label">Task Name</label>
+                  <input
+                    type="text"
+                    className="new-task-input"
+                    placeholder="What needs to be done?"
+                    value={taskTitle}
+                    onChange={(e) => handleTitleChange(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Escape') setIsNewTaskOpen(false);
+                    }}
+                    autoFocus
+                    required
+                  />
+                </div>
+
+                {/* 2. Description */}
+                <div className="new-task-field">
+                  <label className="new-task-label">Description</label>
+                  <textarea
+                    className="new-task-textarea"
+                    placeholder="Add description (optional)..."
+                    rows={2}
+                    value={taskDescription}
+                    onChange={(e) => setTaskDescription(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Escape') setIsNewTaskOpen(false);
+                      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                        handleCreateNewTask(e);
+                      }
+                    }}
+                  />
+                </div>
+
+                {/* 3. Date (Selection Based, no emojis) */}
+                <div className="new-task-field">
+                  <label className="new-task-label">Date</label>
+                  <div className="new-task-selection-row">
+                    <button
+                      type="button"
+                      className={`new-task-chip${taskDueDate === getTodayStr() ? ' active' : ''}`}
+                      onClick={() => setTaskDueDate(getTodayStr())}
+                    >
+                      Today
+                    </button>
+                    <button
+                      type="button"
+                      className={`new-task-chip${taskDueDate === getTomorrowStr() ? ' active' : ''}`}
+                      onClick={() => setTaskDueDate(getTomorrowStr())}
+                    >
+                      Tomorrow
+                    </button>
+                    <button
+                      type="button"
+                      className={`new-task-chip${taskDueDate === toDateStr(addWeeks(new Date(), 1)) ? ' active' : ''}`}
+                      onClick={() => setTaskDueDate(toDateStr(addWeeks(new Date(), 1)))}
+                    >
+                      Next Week
+                    </button>
+
+                    <div
+                      className={`new-task-picker-chip${
+                        taskDueDate &&
+                        taskDueDate !== getTodayStr() &&
+                        taskDueDate !== getTomorrowStr() &&
+                        taskDueDate !== toDateStr(addWeeks(new Date(), 1))
+                          ? ' active'
+                          : ''
+                      }`}
+                      title="Choose specific date"
+                    >
+                      <CalendarIcon size={12} className="picker-icon" />
+                      <input
+                        type="date"
+                        className="new-task-picker-input"
+                        value={taskDueDate}
+                        onChange={(e) => setTaskDueDate(e.target.value || getTodayStr())}
+                        aria-label="Select date"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. Time (Selection Based, NO emojis) */}
+                <div className="new-task-field">
+                  <label className="new-task-label">Time</label>
+                  <div className="new-task-selection-row">
+                    {TIME_SELECTION_OPTIONS.map((opt) => {
+                      const isSelected = taskDueTime === opt.time;
+                      return (
+                        <button
+                          key={opt.time}
+                          type="button"
+                          className={`new-task-chip${isSelected ? ' active' : ''}`}
+                          onClick={() => setTaskDueTime(isSelected ? null : opt.time)}
+                        >
+                          {use24h ? opt.time : opt.label12}
+                        </button>
+                      );
+                    })}
+
+                    <div
+                      className={`new-task-picker-chip${
+                        taskDueTime && !TIME_SELECTION_OPTIONS.some((o) => o.time === taskDueTime)
+                          ? ' active'
+                          : ''
+                      }`}
+                      title="Custom time"
+                    >
+                      <Clock size={12} className="picker-icon" />
+                      <input
+                        type="time"
+                        className="new-task-picker-input"
+                        value={taskDueTime || ''}
+                        onChange={(e) => setTaskDueTime(e.target.value || null)}
+                        aria-label="Select custom time"
+                      />
+                    </div>
+
+                    {taskDueTime && (
+                      <button
+                        type="button"
+                        className="new-task-chip chip-clear"
+                        onClick={() => setTaskDueTime(null)}
+                        title="Clear time"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="new-task-modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => setIsNewTaskOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-sm"
+                  disabled={!taskTitle.trim()}
+                >
+                  Create Task
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Day Schedule View (Only when clicking "+X more" on a busy month day) */}
+      {viewingDayTasks && (
+        <div
+          className="calendar-modal-overlay"
+          onClick={() => setViewingDayTasks(null)}
         >
           <div
             className="calendar-modal"
@@ -363,235 +574,78 @@ export function CalendarView() {
             <div className="calendar-modal-header">
               <div>
                 <h3 className="calendar-modal-title">
-                  {format(selectedDay, 'EEEE, MMMM d, yyyy')}
+                  {format(viewingDayTasks, 'EEEE, MMMM d, yyyy')}
                 </h3>
                 <p className="calendar-modal-subtitle">
-                  {selectedDayTasks.length}{' '}
-                  {selectedDayTasks.length === 1 ? 'task' : 'tasks'} scheduled
+                  {(tasksByDate[toDateStr(viewingDayTasks)] || []).length} scheduled
                 </p>
               </div>
               <button
                 className="calendar-modal-close"
-                onClick={() => setSelectedDay(null)}
+                onClick={() => setViewingDayTasks(null)}
                 aria-label="Close"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 
             <div className="calendar-modal-body">
-              {selectedDayTasks.length === 0 ? (
-                <div
-                  style={{
-                    padding: 'var(--space-6) 0',
-                    textAlign: 'center',
-                    color: 'var(--text-tertiary)',
-                    fontSize: 'var(--font-size-sm)',
-                  }}
-                >
-                  No tasks scheduled for this day.
-                </div>
-              ) : (
-                selectedDayTasks.map((task) => {
-                  const isCompleted = task.status === 'completed';
-                  return (
+              {(tasksByDate[toDateStr(viewingDayTasks)] || []).map((task) => {
+                const isCompleted = task.status === 'completed';
+                return (
+                  <div
+                    key={task.id}
+                    className={`task-row${isCompleted ? ' completed' : ''}`}
+                    style={{ padding: 'var(--space-2) var(--space-3)' }}
+                    onClick={() => {
+                      setViewingDayTasks(null);
+                      openDetailPanel(task.id);
+                    }}
+                  >
                     <div
-                      key={task.id}
-                      className={`task-row${isCompleted ? ' completed' : ''}`}
-                      style={{ padding: 'var(--space-2) var(--space-3)' }}
-                      onClick={() => {
-                        setSelectedDay(null);
-                        openDetailPanel(task.id);
+                      className="task-checkbox"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (isCompleted) uncompleteTask(task.id);
+                        else completeTask(task.id);
                       }}
                     >
-                      <div
-                        className="task-checkbox"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (isCompleted) uncompleteTask(task.id);
-                          else completeTask(task.id);
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isCompleted}
-                          onChange={() => {}}
-                          tabIndex={-1}
-                        />
-                        <div className="task-checkbox-visual">
-                          <Check className="check-icon" />
-                        </div>
-                      </div>
-
-                      <div className="task-content">
-                        <span className="task-title">{task.title}</span>
-                        {(task.dueTime || task.estimatedDuration) && (
-                          <div className="task-meta">
-                            {task.dueTime && (
-                              <span className="task-meta-item">
-                                <Clock size={11} className="meta-icon" />
-                                {formatTime(task.dueTime, use24h)}
-                              </span>
-                            )}
-                            {task.estimatedDuration && (
-                              <span className="task-meta-item">
-                                {formatDuration(task.estimatedDuration)}
-                              </span>
-                            )}
-                          </div>
-                        )}
+                      <input
+                        type="checkbox"
+                        checked={isCompleted}
+                        onChange={() => {}}
+                        tabIndex={-1}
+                      />
+                      <div className="task-checkbox-visual">
+                        <Check className="check-icon" />
                       </div>
                     </div>
-                  );
-                })
-              )}
+
+                    <div className="task-content">
+                      <span className="task-title">{task.title}</span>
+                      {task.dueTime && (
+                        <div className="task-meta">
+                          <span className="task-meta-item">
+                            <Clock size={11} className="meta-icon" />
+                            {formatTime(task.dueTime, use24h)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
-            <div className="calendar-modal-footer">
-              {/* Natural Language Live Detection Pill */}
-              {naturalDetected && (
-                <div className="calendar-modal-detected-badge" role="status" aria-live="polite">
-                  <div className="detected-badge-left">
-                    <Sparkles size={13} className="detected-badge-icon" />
-                    <span className="detected-badge-label">Detected:</span>
-                    {naturalDetected.dueDate && (
-                      <span className="detected-badge-tag">
-                        📅 {formatDate(naturalDetected.dueDate)}
-                      </span>
-                    )}
-                    {naturalDetected.dueTime && (
-                      <span className="detected-badge-tag">
-                        ⏰ {formatTime(naturalDetected.dueTime, use24h)}
-                      </span>
-                    )}
-                  </div>
-                  {naturalDetected.cleanTitle !== quickTaskTitle.trim() && (
-                    <span className="detected-badge-taskname" title={`Clean title: "${naturalDetected.cleanTitle}"`}>
-                      "{naturalDetected.cleanTitle}"
-                    </span>
-                  )}
-                </div>
-              )}
-
-              <form
-                className="calendar-modal-input-form"
-                onSubmit={handleModalSubmit}
+            <div className="calendar-modal-footer" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={() => openNewTaskModal(viewingDayTasks)}
               >
-                <input
-                  type="text"
-                  className="calendar-modal-input"
-                  placeholder={`Add a task (e.g., "Meeting tomorrow 3pm")...`}
-                  value={quickTaskTitle}
-                  onChange={(e) => setQuickTaskTitle(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Escape') {
-                      setSelectedDay(null);
-                      setQuickTaskTitle('');
-                      setQuickTaskTime(null);
-                    }
-                  }}
-                  autoFocus
-                />
-                <div
-                  className={`calendar-modal-time-chip${(quickTaskTime || naturalDetected?.dueTime) ? ' active' : ''}`}
-                  title="Completion time"
-                >
-                  <Clock size={13} className="time-chip-icon" />
-                  <input
-                    type="time"
-                    className="calendar-modal-time-input"
-                    value={quickTaskTime || naturalDetected?.dueTime || ''}
-                    onChange={(e) => setQuickTaskTime(e.target.value || null)}
-                    aria-label="Completion time"
-                  />
-                  {(quickTaskTime || naturalDetected?.dueTime) && (
-                    <button
-                      type="button"
-                      className="time-chip-clear"
-                      onClick={() => setQuickTaskTime(null)}
-                      title="Clear time"
-                      aria-label="Clear time"
-                    >
-                      <X size={11} />
-                    </button>
-                  )}
-                </div>
-                <button
-                  type="submit"
-                  className="btn btn-primary btn-sm"
-                  disabled={!quickTaskTitle.trim()}
-                >
-                  Add
-                </button>
-              </form>
-
-              {/* Minimal 1-Click Quick Time & Date Presets */}
-              <div className="calendar-modal-presets-bar">
-                {/* 1-Click Time Presets */}
-                <div className="calendar-preset-section">
-                  <span className="calendar-preset-label">Quick Time:</span>
-                  <div className="calendar-preset-chips-scroll">
-                    {QUICK_TIME_PRESETS.map((preset) => {
-                      const isSelected =
-                        quickTaskTime === preset.time ||
-                        (!quickTaskTime && naturalDetected?.dueTime === preset.time);
-                      return (
-                        <button
-                          key={preset.time}
-                          type="button"
-                          className={`calendar-preset-chip${isSelected ? ' active' : ''}`}
-                          onClick={() => {
-                            if (quickTaskTime === preset.time) {
-                              setQuickTaskTime(null);
-                            } else {
-                              setQuickTaskTime(preset.time);
-                            }
-                          }}
-                          title={`${preset.desc} (${preset.label12})`}
-                        >
-                          <span className="preset-chip-emoji">{preset.emoji}</span>
-                          <span>{use24h ? preset.time : preset.label12}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* 1-Click Date Shift Chips */}
-                <div className="calendar-preset-section">
-                  <span className="calendar-preset-label">Day:</span>
-                  <div className="calendar-preset-chips-scroll">
-                    <button
-                      type="button"
-                      className={`calendar-preset-chip${isTodayFn(selectedDay) ? ' active' : ''}`}
-                      onClick={() => setSelectedDay(new Date())}
-                    >
-                      Today
-                    </button>
-                    <button
-                      type="button"
-                      className={`calendar-preset-chip${isSameDay(selectedDay, addDays(new Date(), 1)) ? ' active' : ''}`}
-                      onClick={() => setSelectedDay(addDays(new Date(), 1))}
-                    >
-                      Tomorrow
-                    </button>
-                    <button
-                      type="button"
-                      className={`calendar-preset-chip${isSameDay(selectedDay, addDays(new Date(), 2)) ? ' active' : ''}`}
-                      onClick={() => setSelectedDay(addDays(new Date(), 2))}
-                    >
-                      +2 Days
-                    </button>
-                    <button
-                      type="button"
-                      className={`calendar-preset-chip${isSameDay(selectedDay, addWeeks(new Date(), 1)) ? ' active' : ''}`}
-                      onClick={() => setSelectedDay(addWeeks(new Date(), 1))}
-                    >
-                      Next Week
-                    </button>
-                  </div>
-                </div>
-              </div>
+                <Plus size={14} style={{ marginRight: 4 }} />
+                New Task
+              </button>
             </div>
           </div>
         </div>
