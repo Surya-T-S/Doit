@@ -51,6 +51,12 @@ interface UIState {
   // Mobile sidebar
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
+
+  // Calendar navigation
+  calendarDate: Date;
+  setCalendarDate: (date: Date | ((prev: Date) => Date)) => void;
+  calendarViewMode: 'month' | 'week';
+  setCalendarViewMode: (mode: 'month' | 'week') => void;
 }
 
 let toastCounter = 0;
@@ -58,6 +64,14 @@ let toastCounter = 0;
 export const useUIStore = create<UIState>((set) => ({
   currentView: 'calendar',
   setView: (view) => set({ currentView: view, sidebarOpen: false }),
+
+  calendarDate: new Date(),
+  setCalendarDate: (date) =>
+    set((state) => ({
+      calendarDate: typeof date === 'function' ? date(state.calendarDate) : date,
+    })),
+  calendarViewMode: 'month',
+  setCalendarViewMode: (mode) => set({ calendarViewMode: mode }),
 
   selectedTaskId: null,
   setSelectedTaskId: (id) => set({ selectedTaskId: id }),

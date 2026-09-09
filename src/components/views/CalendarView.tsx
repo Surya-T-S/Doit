@@ -1,22 +1,14 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
-  ChevronLeft,
-  ChevronRight,
   Plus,
   X,
   Check,
   Clock,
-  Calendar as CalendarIcon,
 } from 'lucide-react';
 import {
   format,
-  addMonths,
-  subMonths,
-  addWeeks,
-  subWeeks,
   isToday as isTodayFn,
   isSameDay,
-  parseISO,
 } from 'date-fns';
 import { useTaskStore } from '../../stores/taskStore';
 import { useUIStore } from '../../stores/uiStore';
@@ -31,8 +23,6 @@ import {
 import type { Task } from '../../types';
 
 export function CalendarView() {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [viewMode, setViewMode] = useState<'month' | 'week'>('month');
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [quickTaskTitle, setQuickTaskTitle] = useState('');
   const [quickTaskTime, setQuickTaskTime] = useState<string | null>(null);
@@ -41,14 +31,14 @@ export function CalendarView() {
   const addTask = useTaskStore((s) => s.addTask);
   const completeTask = useTaskStore((s) => s.completeTask);
   const uncompleteTask = useTaskStore((s) => s.uncompleteTask);
-  const { openDetailPanel, addToast } = useUIStore();
+  const { openDetailPanel, addToast, calendarDate, calendarViewMode } = useUIStore();
   const { weekStartsOn, timeFormat } = useSettingsStore();
 
   const use24h = timeFormat === '24h';
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
+  const year = calendarDate.getFullYear();
+  const month = calendarDate.getMonth();
 
-  // Listen for external trigger to open calendar task creation modal (shortcut 'N' or Command Palette)
+  // Listen for external trigger to open calendar task creation modal (shortcut 'N' or header button)
   useEffect(() => {
     const handleOpenCreator = (e: Event) => {
       const customEvent = e as CustomEvent<{ date?: Date }>;
@@ -64,10 +54,15 @@ export function CalendarView() {
     [year, month, weekStartsOn]
   );
 
+  const weeksCount = useMemo(
+    () => Math.max(Math.ceil(calendarDays.length / 7), 5),
+    [calendarDays]
+  );
+
   // Week days
   const weekDays = useMemo(
-    () => getWeekDays(currentDate, weekStartsOn),
-    [currentDate, weekStartsOn]
+    () => getWeekDays(calendarDate, weekStartsOn),
+    [calendarDate, weekStartsOn]
   );
 
   // Map tasks by dueDate
@@ -90,25 +85,6 @@ export function CalendarView() {
     }
     return days;
   }, [weekStartsOn]);
-
-  // Navigation handlers
-  const goToPrev = () => {
-    if (viewMode === 'month') {
-      setCurrentDate((d) => subMonths(d, 1));
-    } else {
-      setCurrentDate((d) => subWeeks(d, 1));
-    }
-  };
-
-  const goToNext = () => {
-    if (viewMode === 'month') {
-      setCurrentDate((d) => addMonths(d, 1));
-    } else {
-      setCurrentDate((d) => addWeeks(d, 1));
-    }
-  };
-
-  const goToToday = () => setCurrentDate(new Date());
 
   // Task creation for a specific day
   const handleCreateTaskForDay = useCallback(
@@ -138,18 +114,6 @@ export function CalendarView() {
     setQuickTaskTime(null);
   };
 
-  // Title display
-  const titleText = useMemo(() => {
-    if (viewMode === 'month') {
-      return format(currentDate, 'MMMM yyyy');
-    }
-    const startStr = format(weekDays[0], 'MMM d');
-    const endStr = isSameDay(weekDays[0], weekDays[6])
-      ? ''
-      : format(weekDays[6], 'MMM d, yyyy');
-    return `${startStr} – ${endStr}`;
-  }, [viewMode, currentDate, weekDays]);
-
   // Tasks for currently opened day modal
   const selectedDayTasks = useMemo(() => {
     if (!selectedDay) return [];
@@ -158,63 +122,15 @@ export function CalendarView() {
   }, [selectedDay, tasksByDate]);
 
   return (
-    <div className="content-area calendar-container">
-      {/* Google Calendar Header */}
-      <div className="calendar-header">
-        <div className="calendar-header-left">
-          <button className="calendar-today-btn" onClick={goToToday}>
-            Today
-          </button>
-          <div className="calendar-nav-group">
-            <button
-              className="calendar-nav-btn"
-              onClick={goToPrev}
-              aria-label={viewMode === 'month' ? 'Previous month' : 'Previous week'}
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <button
-              className="calendar-nav-btn"
-              onClick={goToNext}
-              aria-label={viewMode === 'month' ? 'Next month' : 'Next week'}
-            >
-              <ChevronRight size={18} />
-            </button>
-          </div>
-          <h2 className="calendar-month-title">{titleText}</h2>
-        </div>
-
-        <div className="calendar-header-right">
-          <div className="calendar-view-toggle">
-            <button
-              className={`calendar-toggle-btn${viewMode === 'month' ? ' active' : ''}`}
-              onClick={() => setViewMode('month')}
-            >
-              Month
-            </button>
-            <button
-              className={`calendar-toggle-btn${viewMode === 'week' ? ' active' : ''}`}
-              onClick={() => setViewMode('week')}
-            >
-              Week
-            </button>
-          </div>
-
-          <button
-            className="calendar-primary-add-btn"
-            onClick={() => setSelectedDay(new Date())}
-            title="Schedule a new task (N)"
-            aria-label="Schedule a new task"
-          >
-            <Plus size={14} />
-            <span>New Task</span>
-          </button>
-        </div>
-      </div>
-
+    <div className="calendar-container">
       {/* View Mode: Month */}
-      {viewMode === 'month' && (
-        <div className="calendar-grid" role="grid" aria-label="Calendar">
+      {calendarViewMode === 'month' && (
+        <div
+          className="calendar-grid"
+          role="grid"
+          aria-label="Calendar"
+          style={{ gridTemplateRows: `26px repeat(${weeksCount}, 1fr)` }}
+        >
           {dayHeaders.map((day) => (
             <div key={day} className="calendar-day-header" role="columnheader">
               {day}
@@ -313,7 +229,7 @@ export function CalendarView() {
       )}
 
       {/* View Mode: Week */}
-      {viewMode === 'week' && (
+      {calendarViewMode === 'week' && (
         <div className="calendar-week-grid" role="grid" aria-label="Week View">
           {weekDays.map((day, idx) => {
             const dateStr = toDateStr(day);

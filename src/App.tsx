@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Search, Menu, Command, Clock } from 'lucide-react';
-import { format } from 'date-fns';
+import React, { useEffect, useState, useMemo } from 'react';
+import { Search, Menu, Command, Clock, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { format, subMonths, addMonths, subWeeks, addWeeks, isSameDay } from 'date-fns';
+import { getWeekDays } from './utils/dates';
 import { useTaskStore } from './stores/taskStore';
 import { useUIStore } from './stores/uiStore';
 import { useSettingsStore } from './stores/settingsStore';
@@ -42,7 +43,38 @@ function App() {
     setCommandPaletteOpen,
     sidebarOpen,
     setSidebarOpen,
+    calendarDate,
+    setCalendarDate,
+    calendarViewMode,
+    setCalendarViewMode,
   } = useUIStore();
+
+  const weekStartsOn = useSettingsStore((s) => s.weekStartsOn);
+
+  // Calendar title computation
+  const calendarTitle = useMemo(() => {
+    if (calendarViewMode === 'month') {
+      return format(calendarDate, 'MMMM yyyy');
+    }
+    const weekDays = getWeekDays(calendarDate, weekStartsOn);
+    const startStr = format(weekDays[0], 'MMM d');
+    const endStr = isSameDay(weekDays[0], weekDays[6])
+      ? ''
+      : format(weekDays[6], 'MMM d, yyyy');
+    return `${startStr} – ${endStr}`;
+  }, [calendarViewMode, calendarDate, weekStartsOn]);
+
+  const handlePrevCalendar = () => {
+    setCalendarDate((d) => (calendarViewMode === 'month' ? subMonths(d, 1) : subWeeks(d, 1)));
+  };
+
+  const handleNextCalendar = () => {
+    setCalendarDate((d) => (calendarViewMode === 'month' ? addMonths(d, 1) : addWeeks(d, 1)));
+  };
+
+  const handleTodayCalendar = () => {
+    setCalendarDate(new Date());
+  };
 
   // Initialize
   useEffect(() => {
@@ -96,11 +128,6 @@ function App() {
     }
   };
 
-  const viewTitles: Record<string, string> = {
-    calendar: 'Calendar',
-    all: 'All Tasks',
-  };
-
   return (
     <div className="app-shell">
       {/* Mobile sidebar backdrop */}
@@ -114,25 +141,95 @@ function App() {
 
       {/* Main Content */}
       <div className="main-content">
-        {/* Header with natural Day, Date, and Live Time placement */}
+        {/* Unified Top Header - Clean, zero clutter */}
         <header className="main-header">
-          <div className="main-header-left">
-            <button
-              className="mobile-menu-btn"
-              onClick={() => setSidebarOpen(true)}
-              aria-label="Open menu"
-            >
-              <Menu size={20} />
-            </button>
-            <div className="main-header-title-group">
-              <h2 className="main-header-title">{viewTitles[currentView]}</h2>
-              <span className="main-header-date-badge">
-                {format(currentTime, 'EEEE, MMMM d')}
-              </span>
+          {currentView === 'calendar' ? (
+            <div className="main-header-calendar-left">
+              <button
+                className="mobile-menu-btn"
+                onClick={() => setSidebarOpen(true)}
+                aria-label="Open menu"
+              >
+                <Menu size={20} />
+              </button>
+              <button
+                className="calendar-today-btn"
+                onClick={handleTodayCalendar}
+              >
+                Today
+              </button>
+              <div className="calendar-nav-group">
+                <button
+                  className="calendar-nav-btn"
+                  onClick={handlePrevCalendar}
+                  aria-label="Previous"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <button
+                  className="calendar-nav-btn"
+                  onClick={handleNextCalendar}
+                  aria-label="Next"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
+              <h2 className="main-header-calendar-title">{calendarTitle}</h2>
             </div>
-          </div>
+          ) : (
+            <div className="main-header-left">
+              <button
+                className="mobile-menu-btn"
+                onClick={() => setSidebarOpen(true)}
+                aria-label="Open menu"
+              >
+                <Menu size={20} />
+              </button>
+              <div className="main-header-title-group">
+                <h2 className="main-header-title">All Tasks</h2>
+                <span className="main-header-date-badge">
+                  {format(currentTime, 'EEEE, MMMM d')}
+                </span>
+              </div>
+            </div>
+          )}
 
           <div className="main-header-actions">
+            {currentView === 'calendar' && (
+              <>
+                <div className="calendar-view-toggle">
+                  <button
+                    className={`calendar-toggle-btn${calendarViewMode === 'month' ? ' active' : ''}`}
+                    onClick={() => setCalendarViewMode('month')}
+                  >
+                    Month
+                  </button>
+                  <button
+                    className={`calendar-toggle-btn${calendarViewMode === 'week' ? ' active' : ''}`}
+                    onClick={() => setCalendarViewMode('week')}
+                  >
+                    Week
+                  </button>
+                </div>
+
+                <button
+                  className="calendar-primary-add-btn"
+                  onClick={() =>
+                    window.dispatchEvent(
+                      new CustomEvent('open-calendar-new-task', {
+                        detail: { date: calendarDate },
+                      })
+                    )
+                  }
+                  title="Schedule a new task (N)"
+                  aria-label="Schedule a new task"
+                >
+                  <Plus size={14} />
+                  <span>New Task</span>
+                </button>
+              </>
+            )}
+
             {/* Live Clock pill */}
             <div
               className="main-header-clock"
@@ -192,7 +289,7 @@ function App() {
 
         {/* Content with optional detail panel */}
         <div className="content-with-panel">
-          <div className="main-body">
+          <div className={`main-body${currentView === 'calendar' ? ' calendar-view-body' : ''}`}>
             <ErrorBoundary>
               {renderView()}
             </ErrorBoundary>
