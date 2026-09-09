@@ -2,8 +2,9 @@ import React, { useCallback } from 'react';
 import { Check, GripVertical, Trash2, Calendar, Clock, Tag } from 'lucide-react';
 import { useTaskStore } from '../../stores/taskStore';
 import { useUIStore } from '../../stores/uiStore';
+import { useSettingsStore } from '../../stores/settingsStore';
 import type { Task } from '../../types';
-import { formatDate, isOverdue, isDueToday } from '../../utils/dates';
+import { formatDate, formatTime, isOverdue, isDueToday } from '../../utils/dates';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -18,6 +19,8 @@ export function TaskRow({ task, isDraggable = false }: TaskRowProps) {
   const deleteTask = useTaskStore((s) => s.deleteTask);
   const { selectedTaskId, openDetailPanel } = useUIStore();
   const addToast = useUIStore((s) => s.addToast);
+  const timeFormat = useSettingsStore((s) => s.timeFormat);
+  const use24h = timeFormat === '24h';
 
   const isCompleted = task.status === 'completed';
   const isSelected = selectedTaskId === task.id;
@@ -85,7 +88,7 @@ export function TaskRow({ task, isDraggable = false }: TaskRowProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`task-row${isCompleted ? ' completed' : ''}${isSelected ? ' selected' : ''}${isDragging ? ' dragging' : ''}`}
+      className={`task-row priority-${task.priority}${isCompleted ? ' completed' : ''}${isSelected ? ' selected' : ''}${isDragging ? ' dragging' : ''}${taskOverdue ? ' is-overdue' : ''}${taskDueToday ? ' is-today' : ''}`}
       onClick={handleClick}
       role="button"
       tabIndex={0}
@@ -123,27 +126,45 @@ export function TaskRow({ task, isDraggable = false }: TaskRowProps) {
       </div>
 
       {task.priority !== 'none' && (
-        <div className={`task-priority-dot ${task.priority}`} aria-label={`Priority: ${task.priority}`} />
+        <div
+          className={`task-priority-dot ${task.priority}`}
+          aria-label={`Priority: ${task.priority}`}
+        />
       )}
 
       <div className="task-content">
         <span className="task-title">{task.title}</span>
+
         <div className="task-meta">
-          {task.dueDate && (
-            <span className={`task-meta-item${taskOverdue ? ' overdue' : ''}${taskDueToday ? ' due-today' : ''}`}>
-              <Calendar size={12} className="meta-icon" />
-              {formatDate(task.dueDate)}
+          {/* Prominent Schedule Badge (Date & Time) */}
+          {(task.dueDate || task.dueTime) && (
+            <span
+              className={`task-schedule-badge${taskOverdue ? ' overdue' : ''}${taskDueToday ? ' due-today' : ''}`}
+            >
+              <Calendar size={12} className="schedule-icon" />
+              <span className="schedule-date">
+                {task.dueDate ? formatDate(task.dueDate) : 'Today'}
+              </span>
+              {task.dueTime && (
+                <>
+                  <span className="schedule-sep">·</span>
+                  <Clock size={11} className="schedule-icon" />
+                  <span className="schedule-time">{formatTime(task.dueTime, use24h)}</span>
+                </>
+              )}
             </span>
           )}
+
           {task.estimatedDuration && (
-            <span className="task-meta-item">
-              <Clock size={12} className="meta-icon" />
-              {task.estimatedDuration}m
+            <span className="task-meta-item duration-pill">
+              <Clock size={11} className="meta-icon" />
+              <span>{task.estimatedDuration}m</span>
             </span>
           )}
+
           {task.tags.length > 0 && (
-            <span className="task-meta-item">
-              <Tag size={12} className="meta-icon" />
+            <span className="task-meta-item tags-group">
+              <Tag size={11} className="meta-icon" />
               {task.tags.slice(0, 2).map((tag) => (
                 <span key={tag} className="task-tag">{tag}</span>
               ))}
@@ -152,6 +173,7 @@ export function TaskRow({ task, isDraggable = false }: TaskRowProps) {
               )}
             </span>
           )}
+
           {totalSubtasks > 0 && (
             <span className="task-subtask-progress">
               <div className="subtask-bar">
@@ -160,7 +182,7 @@ export function TaskRow({ task, isDraggable = false }: TaskRowProps) {
                   style={{ width: `${(completedSubtasks / totalSubtasks) * 100}%` }}
                 />
               </div>
-              {completedSubtasks}/{totalSubtasks}
+              <span>{completedSubtasks}/{totalSubtasks}</span>
             </span>
           )}
         </div>

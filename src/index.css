@@ -478,35 +478,198 @@ button {
    ============================================================ */
 
 /* --- Quick Entry --- */
-.quick-entry {
+.quick-entry-card {
   margin-bottom: var(--space-6);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+  overflow: hidden;
+}
+
+.quick-entry-card.focused {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-subtle), var(--shadow-md);
+}
+
+.quick-entry-main {
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-4);
+  gap: var(--space-2);
 }
 
 .quick-entry-input {
-  width: 100%;
-  padding: var(--space-3) var(--space-4);
+  flex: 1;
+  border: none;
+  background: none;
   font-size: var(--font-size-md);
   color: var(--text-primary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
-  transition: all var(--transition-fast);
+  padding: var(--space-2) 0;
+  outline: none;
 }
 
 .quick-entry-input::placeholder {
   color: var(--text-tertiary);
 }
 
-.quick-entry-input:focus {
-  background: var(--bg-primary);
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-subtle);
+.quick-entry-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 6px 14px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
 }
 
-.quick-entry-hint {
-  margin-top: var(--space-2);
+.quick-entry-submit-btn .key-hint {
+  opacity: 0.6;
+  margin-left: 2px;
+}
+
+.quick-entry-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-subtle);
   font-size: var(--font-size-xs);
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.quick-entry-meta-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.quick-pill-picker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  position: relative;
+}
+
+.quick-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.quick-meta-chip:hover {
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+  background: var(--bg-hover);
+}
+
+.quick-meta-chip.active {
+  color: var(--accent-text);
+  background: var(--accent-subtle);
+  border-color: var(--accent);
+  font-weight: var(--font-weight-semibold);
+}
+
+.quick-meta-chip .chip-icon {
   color: var(--text-tertiary);
+}
+
+.quick-meta-chip.active .chip-icon {
+  color: var(--accent);
+}
+
+.quick-hidden-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.quick-preset-pill {
+  padding: 3px 8px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.quick-preset-pill:hover {
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border-color: var(--border-default);
+}
+
+.quick-preset-pill.selected {
+  color: var(--accent-text);
+  background: var(--accent-subtle);
+  border-color: var(--accent);
+  font-weight: var(--font-weight-semibold);
+}
+
+.quick-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  color: var(--text-tertiary);
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.quick-clear-btn:hover {
+  color: var(--danger);
+  background: var(--danger-subtle);
+}
+
+.quick-toolbar-separator {
+  width: 1px;
+  height: 14px;
+  background: var(--border-default);
+  margin: 0 var(--space-1);
+}
+
+.quick-entry-shortcut-hint {
+  color: var(--text-tertiary);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.quick-entry-shortcut-hint kbd {
+  display: inline-block;
+  padding: 1px 4px;
+  font-size: 10px;
+  font-family: inherit;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
 }
 
 /* --- Sort Toolbar --- */
@@ -624,27 +787,37 @@ button {
 .task-list {
   display: flex;
   flex-direction: column;
+  gap: var(--space-2);
 }
 
-/* --- Task Row --- */
+/* --- Task Row as Visible, Focused Card --- */
 .task-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-3);
-  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-left: 4px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: background var(--transition-fast);
+  transition: all var(--transition-fast);
   position: relative;
-  min-height: 40px;
+  min-height: 52px;
+  box-shadow: var(--shadow-sm);
 }
 
 .task-row:hover {
   background: var(--bg-hover);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .task-row.selected {
-  background: var(--bg-tertiary);
+  border-color: var(--accent);
+  background: var(--bg-primary);
+  box-shadow: 0 0 0 2px var(--accent-subtle), var(--shadow-md);
 }
 
 .task-row.dragging {
@@ -653,21 +826,60 @@ button {
 }
 
 .task-row.drag-over {
+  border-color: var(--accent);
   background: var(--accent-subtle);
+}
+
+/* Priority Left Borders for immediate focus */
+.task-row.priority-urgent {
+  border-left-color: var(--priority-urgent);
+}
+
+.task-row.priority-high {
+  border-left-color: var(--priority-high);
+}
+
+.task-row.priority-medium {
+  border-left-color: var(--priority-medium);
+}
+
+.task-row.priority-low {
+  border-left-color: var(--priority-low);
+}
+
+.task-row.is-today:not(.priority-urgent):not(.priority-high) {
+  border-left-color: var(--accent);
+}
+
+.task-row.is-overdue {
+  border-left-color: var(--danger);
+}
+
+.task-row.completed {
+  opacity: 0.65;
+  background: var(--bg-secondary);
+  border-color: var(--border-subtle);
+  border-left-color: var(--border-subtle);
+  box-shadow: none;
+}
+
+.task-row.completed:hover {
+  opacity: 0.85;
+  transform: none;
 }
 
 .task-drag-handle {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
+  width: 14px;
   height: 20px;
   color: var(--text-tertiary);
   opacity: 0;
   cursor: grab;
   flex-shrink: 0;
   transition: opacity var(--transition-fast);
-  margin-top: 1px;
+  margin-left: -4px;
 }
 
 .task-row:hover .task-drag-handle {
@@ -678,13 +890,12 @@ button {
   cursor: grabbing;
 }
 
-/* Checkbox */
+/* Checkbox - More visible, tactile */
 .task-checkbox {
   position: relative;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
-  margin-top: 1px;
 }
 
 .task-checkbox input {
@@ -697,18 +908,20 @@ button {
 }
 
 .task-checkbox-visual {
-  width: 18px;
-  height: 18px;
-  border: 1.5px solid var(--checkbox-border);
-  border-radius: var(--radius-sm);
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--checkbox-border);
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all var(--transition-fast);
+  background: var(--bg-primary);
 }
 
 .task-checkbox:hover .task-checkbox-visual {
   border-color: var(--accent);
+  background: var(--accent-subtle);
 }
 
 .task-checkbox input:checked + .task-checkbox-visual {
@@ -717,8 +930,8 @@ button {
 }
 
 .task-checkbox-visual .check-icon {
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
   color: white;
   opacity: 0;
   transform: scale(0.5);
@@ -730,33 +943,36 @@ button {
   transform: scale(1);
 }
 
-/* Priority indicator */
+/* Priority dot */
 .task-priority-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: var(--radius-full);
   flex-shrink: 0;
-  margin-top: 7px;
 }
 
-.task-priority-dot.urgent { background: var(--priority-urgent); }
-.task-priority-dot.high { background: var(--priority-high); }
+.task-priority-dot.urgent { background: var(--priority-urgent); box-shadow: 0 0 6px rgba(239, 68, 68, 0.4); }
+.task-priority-dot.high { background: var(--priority-high); box-shadow: 0 0 6px rgba(245, 158, 11, 0.4); }
 .task-priority-dot.medium { background: var(--priority-medium); }
 .task-priority-dot.low { background: var(--priority-low); }
 .task-priority-dot.none { display: none; }
 
-/* Task content */
+/* Task content - High contrast, focused typography */
 .task-content {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .task-title {
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-normal);
+  font-size: 15px;
+  font-weight: var(--font-weight-medium);
   color: var(--text-primary);
-  line-height: var(--line-height-normal);
+  line-height: 1.35;
   word-break: break-word;
+  letter-spacing: -0.01em;
 }
 
 .task-row.completed .task-title {
@@ -768,37 +984,84 @@ button {
 .task-meta {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  margin-top: var(--space-1);
+  gap: var(--space-2);
   flex-wrap: wrap;
+}
+
+/* Schedule Badge (Due Date + Time) - Very visible and focused */
+.task-schedule-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
+
+.task-schedule-badge .schedule-icon {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.task-schedule-badge .schedule-sep {
+  opacity: 0.5;
+}
+
+.task-schedule-badge.due-today {
+  color: var(--accent-text);
+  background: var(--accent-subtle);
+  border-color: rgba(59, 130, 246, 0.25);
+  font-weight: var(--font-weight-semibold);
+}
+
+.task-schedule-badge.due-today .schedule-icon {
+  color: var(--accent);
+}
+
+.task-schedule-badge.overdue {
+  color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.25);
+  font-weight: var(--font-weight-semibold);
+}
+
+.task-schedule-badge.overdue .schedule-icon {
+  color: var(--danger);
 }
 
 .task-meta-item {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
-  font-size: var(--font-size-xs);
+  gap: 3px;
+  font-size: 11px;
   color: var(--text-tertiary);
 }
 
 .task-meta-item .meta-icon {
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
 }
 
-.task-meta-item.overdue {
-  color: var(--danger);
-}
-
-.task-meta-item.due-today {
-  color: var(--accent);
+.duration-pill {
+  padding: 1px 6px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 11px;
 }
 
 .task-tag {
   display: inline-flex;
   align-items: center;
-  padding: 1px var(--space-2);
-  font-size: var(--font-size-xs);
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: var(--font-weight-medium);
   color: var(--text-secondary);
   background: var(--bg-tertiary);
   border-radius: var(--radius-full);
@@ -807,13 +1070,13 @@ button {
 .task-subtask-progress {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
-  font-size: var(--font-size-xs);
+  gap: 4px;
+  font-size: 11px;
   color: var(--text-tertiary);
 }
 
 .subtask-bar {
-  width: 40px;
+  width: 36px;
   height: 3px;
   background: var(--bg-tertiary);
   border-radius: var(--radius-full);
@@ -849,11 +1112,14 @@ button {
   border-radius: var(--radius-md);
   color: var(--text-tertiary);
   transition: all var(--transition-fast);
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 
 .task-action-btn:hover {
   color: var(--text-primary);
-  background: var(--bg-active);
+  background: var(--bg-hover);
 }
 
 .task-action-btn.danger:hover {

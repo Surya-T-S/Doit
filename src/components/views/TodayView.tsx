@@ -69,7 +69,7 @@ export function TodayView() {
       </div>
 
       {/* Quick Entry */}
-      <QuickEntry />
+      <QuickEntry defaultDueDate={todayStr} placeholder="Add a task for today..." />
 
       {/* Overdue */}
       {overdue.length > 0 && (
