@@ -57,23 +57,22 @@ export function useKeyboardShortcuts() {
       switch (e.key) {
         case 'n':
           e.preventDefault();
-          // Focus the quick entry input
-          const input = document.querySelector('.quick-entry-input') as HTMLInputElement;
-          input?.focus();
+          setView('calendar');
+          setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('open-calendar-new-task', { detail: { date: new Date() } }));
+          }, 50);
           break;
         case '/':
           e.preventDefault();
           setSearchOpen(true);
           break;
-        case 't':
-          e.preventDefault();
-          setView('today');
-          break;
         case 'c':
+        case '1':
           e.preventDefault();
           setView('calendar');
           break;
         case 'a':
+        case '2':
           e.preventDefault();
           setView('all');
           break;

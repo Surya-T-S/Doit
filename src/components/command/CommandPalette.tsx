@@ -45,16 +45,16 @@ export function CommandPalette() {
   const actions: CommandAction[] = useMemo(() => [
     {
       id: 'new-task',
-      label: 'New task',
+      label: 'New task (Calendar)',
       shortcut: 'N',
       icon: 'plus',
       category: 'Actions',
       action: () => {
         close();
+        setView('calendar');
         setTimeout(() => {
-          const input = document.querySelector('.quick-entry-input') as HTMLInputElement;
-          input?.focus();
-        }, 100);
+          window.dispatchEvent(new CustomEvent('open-calendar-new-task', { detail: { date: new Date() } }));
+        }, 50);
       },
     },
     {
@@ -69,12 +69,12 @@ export function CommandPalette() {
       },
     },
     {
-      id: 'view-today',
-      label: 'Go to Today',
-      shortcut: 'T',
-      icon: 'sun',
+      id: 'view-calendar',
+      label: 'Go to Calendar',
+      shortcut: 'C',
+      icon: 'calendar',
       category: 'Navigation',
-      action: () => { close(); setView('today'); },
+      action: () => { close(); setView('calendar'); },
     },
     {
       id: 'view-all',
@@ -83,14 +83,6 @@ export function CommandPalette() {
       icon: 'list',
       category: 'Navigation',
       action: () => { close(); setView('all'); },
-    },
-    {
-      id: 'view-calendar',
-      label: 'Go to Calendar',
-      shortcut: 'C',
-      icon: 'calendar',
-      category: 'Navigation',
-      action: () => { close(); setView('calendar'); },
     },
     {
       id: 'filter-overdue',

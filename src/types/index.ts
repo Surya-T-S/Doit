@@ -77,7 +77,7 @@ export type FilterPreset =
 // --- User Settings ---
 
 export type ThemeMode = 'light' | 'dark' | 'system';
-export type ViewType = 'today' | 'all' | 'calendar';
+export type ViewType = 'calendar' | 'all';
 export type TimeFormat = '12h' | '24h';
 
 export interface UserSettings {

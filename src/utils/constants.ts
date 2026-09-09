@@ -11,7 +11,7 @@ export const DATA_VERSION = 1;
 export const DEFAULT_SETTINGS: UserSettings = {
   theme: 'system',
   dailyCapacityMinutes: 480, // 8 hours
-  defaultView: 'today',
+  defaultView: 'calendar',
   sortMode: 'custom',
   sortDirection: 'asc',
   showCompletedTasks: true,
@@ -46,8 +46,8 @@ export const SHORTCUTS = {
   COMPLETE_TASK: ' ', // Space
   DELETE_TASK: 'Delete',
   SEARCH: '/',
-  TODAY_VIEW: 't',
   CALENDAR_VIEW: 'c',
+  ALL_TASKS_VIEW: 'a',
   FOCUS_MODE: 'f',
   COMMAND_PALETTE: 'k', // With Cmd/Ctrl
   ESCAPE: 'Escape',

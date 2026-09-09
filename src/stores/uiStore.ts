@@ -56,7 +56,7 @@ interface UIState {
 let toastCounter = 0;
 
 export const useUIStore = create<UIState>((set) => ({
-  currentView: 'today',
+  currentView: 'calendar',
   setView: (view) => set({ currentView: view, sidebarOpen: false }),
 
   selectedTaskId: null,

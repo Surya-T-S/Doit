@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   ChevronLeft,
   ChevronRight,
@@ -35,6 +35,7 @@ export function CalendarView() {
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month');
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [quickTaskTitle, setQuickTaskTitle] = useState('');
+  const [quickTaskTime, setQuickTaskTime] = useState<string | null>(null);
 
   const tasks = useTaskStore((s) => s.tasks);
   const addTask = useTaskStore((s) => s.addTask);
@@ -46,6 +47,16 @@ export function CalendarView() {
   const use24h = timeFormat === '24h';
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
+
+  // Listen for external trigger to open calendar task creation modal (shortcut 'N' or Command Palette)
+  useEffect(() => {
+    const handleOpenCreator = (e: Event) => {
+      const customEvent = e as CustomEvent<{ date?: Date }>;
+      setSelectedDay(customEvent.detail?.date || new Date());
+    };
+    window.addEventListener('open-calendar-new-task', handleOpenCreator);
+    return () => window.removeEventListener('open-calendar-new-task', handleOpenCreator);
+  }, []);
 
   // Calendar month days
   const calendarDays = useMemo(
@@ -101,25 +112,30 @@ export function CalendarView() {
 
   // Task creation for a specific day
   const handleCreateTaskForDay = useCallback(
-    (date: Date, title: string) => {
+    (date: Date, title: string, time?: string | null) => {
       const trimmed = title.trim();
       if (!trimmed) return;
       const dateStr = toDateStr(date);
-      addTask(trimmed, { dueDate: dateStr });
+      addTask(trimmed, {
+        dueDate: dateStr,
+        dueTime: time || null,
+      });
+      const timeStr = time ? ` at ${formatTime(time, use24h)}` : '';
       addToast({
-        message: `Task scheduled for ${format(date, 'MMM d')}`,
+        message: `Task scheduled for ${format(date, 'MMM d')}${timeStr}`,
         type: 'success',
         duration: 2500,
       });
     },
-    [addTask, addToast]
+    [addTask, addToast, use24h]
   );
 
   const handleModalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedDay || !quickTaskTitle.trim()) return;
-    handleCreateTaskForDay(selectedDay, quickTaskTitle);
+    handleCreateTaskForDay(selectedDay, quickTaskTitle, quickTaskTime);
     setQuickTaskTitle('');
+    setQuickTaskTime(null);
   };
 
   // Title display
@@ -183,6 +199,16 @@ export function CalendarView() {
               Week
             </button>
           </div>
+
+          <button
+            className="calendar-primary-add-btn"
+            onClick={() => setSelectedDay(new Date())}
+            title="Schedule a new task (N)"
+            aria-label="Schedule a new task"
+          >
+            <Plus size={14} />
+            <span>New Task</span>
+          </button>
         </div>
       </div>
 
@@ -488,6 +514,27 @@ export function CalendarView() {
                   onChange={(e) => setQuickTaskTitle(e.target.value)}
                   autoFocus
                 />
+                <div className="calendar-modal-time-chip" title="Set optional due time">
+                  <Clock size={13} className="time-chip-icon" />
+                  <input
+                    type="time"
+                    className="calendar-modal-time-input"
+                    value={quickTaskTime || ''}
+                    onChange={(e) => setQuickTaskTime(e.target.value || null)}
+                    aria-label="Due time"
+                  />
+                  {quickTaskTime && (
+                    <button
+                      type="button"
+                      className="time-chip-clear"
+                      onClick={() => setQuickTaskTime(null)}
+                      title="Clear time"
+                      aria-label="Clear time"
+                    >
+                      <X size={11} />
+                    </button>
+                  )}
+                </div>
                 <button
                   type="submit"
                   className="btn btn-primary btn-sm"

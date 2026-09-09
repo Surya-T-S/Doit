@@ -11,7 +11,6 @@ import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { Navigation } from './components/layout/Navigation';
 
 // Views
-import { TodayView } from './components/views/TodayView';
 import { AllTasksView } from './components/views/AllTasksView';
 import { CalendarView } from './components/views/CalendarView';
 
@@ -24,6 +23,7 @@ import { CommandPalette } from './components/command/CommandPalette';
 // Common
 import { SettingsPanel } from './components/common/SettingsPanel';
 import { ToastContainer } from './components/common/ToastContainer';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 function App() {
   const initTasks = useTaskStore((s) => s.initialize);
@@ -88,21 +88,17 @@ function App() {
 
   const renderView = () => {
     switch (currentView) {
-      case 'today':
-        return <TodayView />;
       case 'all':
         return <AllTasksView />;
       case 'calendar':
-        return <CalendarView />;
       default:
-        return <TodayView />;
+        return <CalendarView />;
     }
   };
 
   const viewTitles: Record<string, string> = {
-    today: 'Today',
-    all: 'All Tasks',
     calendar: 'Calendar',
+    all: 'All Tasks',
   };
 
   return (
@@ -131,7 +127,7 @@ function App() {
             <div className="main-header-title-group">
               <h2 className="main-header-title">{viewTitles[currentView]}</h2>
               <span className="main-header-date-badge">
-                {format(currentTime, currentView === 'today' ? 'EEEE, MMMM d' : 'EEE, MMM d')}
+                {format(currentTime, 'EEEE, MMMM d')}
               </span>
             </div>
           </div>
@@ -197,7 +193,9 @@ function App() {
         {/* Content with optional detail panel */}
         <div className="content-with-panel">
           <div className="main-body">
-            {renderView()}
+            <ErrorBoundary>
+              {renderView()}
+            </ErrorBoundary>
           </div>
 
           {detailPanelOpen && <TaskDetail />}

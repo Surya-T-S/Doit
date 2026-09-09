@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sun, Calendar, ListTodo, Settings, Moon, Monitor } from 'lucide-react';
+import { Calendar, ListTodo, Settings, Moon, Sun, Monitor } from 'lucide-react';
 import { useUIStore } from '../../stores/uiStore';
 import { useTaskStore } from '../../stores/taskStore';
 import { useSettingsStore } from '../../stores/settingsStore';
@@ -11,15 +11,10 @@ export function Navigation() {
   const { theme, setTheme } = useSettingsStore();
 
   const pendingCount = tasks.filter((t) => t.status === 'pending').length;
-  const todayStr = new Date().toISOString().split('T')[0];
-  const todayCount = tasks.filter(
-    (t) => t.status === 'pending' && t.dueDate === todayStr
-  ).length;
 
   const navItems: { view: ViewType; label: string; icon: React.ReactNode; count?: number }[] = [
-    { view: 'today', label: 'Today', icon: <Sun size={16} />, count: todayCount || undefined },
-    { view: 'all', label: 'All Tasks', icon: <ListTodo size={16} />, count: pendingCount || undefined },
     { view: 'calendar', label: 'Calendar', icon: <Calendar size={16} /> },
+    { view: 'all', label: 'All Tasks', icon: <ListTodo size={16} />, count: pendingCount || undefined },
   ];
 
   const handleNavClick = (view: ViewType) => {
