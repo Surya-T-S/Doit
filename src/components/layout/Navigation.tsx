@@ -33,6 +33,7 @@ export function Navigation() {
   return (
     <aside className={`sidebar${sidebarOpen ? ' open' : ''}`} role="navigation" aria-label="Main navigation">
       <div className="sidebar-brand">
+        <img src="./logo.png" alt="Doit logo" className="sidebar-brand-logo" />
         <h1>Doit</h1>
       </div>
 

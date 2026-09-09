@@ -6,8 +6,12 @@ node_modules/
 # Build and production
 dist/
 dist-ssr/
-build/
+dist-electron/
+release/
+build/*
+!build/installer.nsh
 *.tsbuildinfo
+*.blockmap
 
 # Vite & Bundler cache
 .vite/

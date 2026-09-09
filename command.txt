@@ -1,0 +1,109 @@
+================================================================================
+                       DOIT — DEVELOPER CHEATSHEET & COMMANDS
+================================================================================
+
+1. INITIAL SETUP
+--------------------------------------------------------------------------------
+# Install project dependencies
+npm install
+
+# Check TypeScript types for errors (0 errors expected)
+npx tsc --noEmit
+
+
+2. RUNNING LOCALLY (DEVELOPMENT)
+--------------------------------------------------------------------------------
+# Run as Desktop App with Live Hot-Reload (Electron + Vite):
+npm run electron:dev
+
+# Run as Web App in browser (http://localhost:5173):
+npm run dev
+
+# Preview production web build locally:
+npm run preview
+
+
+3. BUILDING & RELEASING (PRODUCTION)
+--------------------------------------------------------------------------------
+# ONE-COMMAND UNIFIED RELEASE (Recommended):
+# Automatically builds frontend, backend, packages Windows & Linux installers,
+# packages Web distribution, organizes into clean folders, and generates SHA-256 checksums:
+npm run release
+
+# Alias for the unified release:
+npm run build:all
+
+# Platform-specific release commands:
+npm run release:win      # Build Windows NSIS installer only
+npm run release:linux    # Build Linux package only
+npm run release:mac      # Build macOS DMG/ZIP (requires macOS)
+npm run release:dir      # Build unpacked application directories only
+
+# Individual build steps (used internally by release pipeline):
+npm run build            # Compile TypeScript and Vite frontend bundle (dist/)
+npm run build:electron   # Compile Electron main & preload bundles (dist-electron/)
+
+
+4. RELEASE ARTIFACTS LOCATIONS
+--------------------------------------------------------------------------------
+After running `npm run release`, artifacts are arranged in:
+
+  release/
+  ├── windows/
+  │   ├── Doit-Setup-1.0.0.exe      <- Windows NSIS Installer (~109 MB)
+  │   └── win-unpacked/             <- Unpacked Windows binaries for instant testing
+  │
+  ├── linux/
+  │   ├── Doit-linux-1.0.0.zip      <- Linux standalone zip package (~118 MB)
+  │   ├── Doit-linux-1.0.0.tar.gz   <- Linux tar.gz archive (~117 MB)
+  │   └── linux-unpacked/           <- Unpacked Linux binaries
+  │
+  ├── macos/
+  │   └── README.md                 <- Guide for macOS builds via GitHub Actions
+  │
+  ├── web/
+  │   ├── index.html                <- Static web app ready to host on any server
+  │   ├── assets/                   <- Production CSS and JS bundles
+  │   └── logo.png                  <- Application branding
+  │
+  └── release-manifest.json         <- Checksums (SHA-256), timestamps, file sizes
+
+
+5. LOCAL HARD DRIVE STORAGE LOCATIONS
+--------------------------------------------------------------------------------
+Data is stored independently of web browsers and persists across cache clears:
+
+  Windows:  %APPDATA%\Doit\doit-data.json
+            (e.g., C:\Users\<Username>\AppData\Roaming\Doit\doit-data.json)
+
+  macOS:    ~/Library/Application Support/Doit/doit-data.json
+
+  Linux:    ~/.config/Doit/doit-data.json
+
+  Web Mode: Browser IndexedDB ("doit-db")
+
+
+6. HOW TO BUMP VERSIONS FOR NEW RELEASES
+--------------------------------------------------------------------------------
+1. Open `package.json` and update `"version"`:
+   "version": "1.0.1"
+
+2. Run the release pipeline:
+   npm run release
+
+3. (Optional) For automated cloud multi-OS releases via GitHub Actions:
+   git tag v1.0.1
+   git push origin v1.0.1
+   GitHub Actions will automatically build Windows, macOS, and Linux releases.
+
+
+7. UNINSTALLATION & DATA CLEANUP
+--------------------------------------------------------------------------------
+# Windows OS Uninstallation:
+  Settings > Apps > Installed apps > Doit > Uninstall
+  Prompt will ask: "Do you also want to completely delete all personal data?"
+  - Select "Yes" for 100% clean wipe with zero leftover files.
+
+# In-App Factory Reset:
+  Settings (gear icon) > Danger Zone > "Wipe All Data"
+================================================================================

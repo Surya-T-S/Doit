@@ -430,11 +430,13 @@ export function SettingsPanel() {
             </div>
           </div>
 
-          {/* Privacy */}
+          {/* Storage & Privacy */}
           <div className="settings-section">
-            <h3 className="settings-section-title">Privacy</h3>
+            <h3 className="settings-section-title">Storage & Privacy</h3>
             <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--text-secondary)', lineHeight: 'var(--line-height-relaxed)' }}>
-              All your data is stored locally on this device. Doit does not send any data to external servers. No analytics, no tracking.
+              {typeof window !== 'undefined' && window.electronAPI?.isDesktop
+                ? 'Desktop Mode: All data is saved directly on your Windows hard drive in %APPDATA%\\Doit\\doit-data.json. Clearing browser cache has zero effect on your data.'
+                : 'All your data is stored locally on this device. Doit does not send any data to external servers. No analytics, no tracking.'}
             </div>
           </div>
 
@@ -443,14 +445,23 @@ export function SettingsPanel() {
             <h3 className="settings-section-title" style={{ color: 'var(--danger)' }}>Danger Zone</h3>
             <div className="settings-row">
               <div>
-                <div className="settings-row-label">Clear all data</div>
+                <div className="settings-row-label">Factory Reset (Wipe All Data)</div>
                 <div className="settings-row-description">
-                  Permanently delete all tasks and settings
+                  Permanently erase all tasks, settings, and local database files
                 </div>
               </div>
               <button className="btn btn-danger btn-sm" onClick={handleClearData}>
-                <Trash2 size={14} /> Clear
+                <Trash2 size={14} /> Wipe All Data
               </button>
+            </div>
+
+            <div style={{ marginTop: 'var(--space-3)', padding: 'var(--space-3)', background: 'var(--bg-tertiary)', borderRadius: 'var(--radius-md)', fontSize: 'var(--font-size-xs)', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+              <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: 'var(--space-1)' }}>Complete Application Removal</strong>
+              {typeof window !== 'undefined' && window.electronAPI?.isDesktop ? (
+                <>To completely delete Doit from this computer: Open Windows <strong>Settings &gt; Apps &gt; Installed apps</strong>, search for <strong>Doit</strong>, and click <strong>Uninstall</strong>. When prompted, choose <strong>Yes</strong> to remove all personal data and configuration files.</>
+              ) : (
+                <>To remove Doit completely from your browser: Click <strong>Wipe All Data</strong> above and clear this site's offline storage in your browser settings.</>
+              )}
             </div>
           </div>
         </div>

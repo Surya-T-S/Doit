@@ -123,3 +123,20 @@ export interface ToastMessage {
     onClick: () => void;
   };
 }
+
+// --- Desktop Electron API ---
+
+export interface ElectronAPI {
+  isDesktop: boolean;
+  getData: () => Promise<string | null>;
+  saveData: (data: string) => Promise<boolean>;
+  getDataPath: () => Promise<string>;
+  getVersion: () => Promise<string>;
+}
+
+declare global {
+  interface Window {
+    electronAPI?: ElectronAPI;
+  }
+}
+

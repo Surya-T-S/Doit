@@ -1,18 +1,86 @@
 {
   "name": "doit",
+  "productName": "Doit",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Minimal, distraction-free personal planning desktop application",
+  "author": "Surya T S",
+  "main": "dist-electron/main.cjs",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:electron": "esbuild electron/main.ts --bundle --platform=node --target=node20 --outfile=dist-electron/main.cjs --external:electron && esbuild electron/preload.ts --bundle --platform=node --target=node20 --outfile=dist-electron/preload.cjs --external:electron",
+    "electron:dev": "npm run build:electron && concurrently -k \"vite\" \"wait-on http://127.0.0.1:5173 && cross-env NODE_ENV=development electron dist-electron/main.cjs\"",
+    "electron:build": "npm run build && npm run build:electron",
+    "release": "node scripts/build-release.js",
+    "build:all": "npm run release",
+    "release:win": "npm run electron:build && electron-builder --win",
+    "release:mac": "npm run electron:build && electron-builder --mac",
+    "release:linux": "npm run electron:build && electron-builder --linux",
+    "release:all": "npm run electron:build && electron-builder -mwl",
+    "release:dir": "npm run electron:build && electron-builder --dir"
+  },
+  "build": {
+    "appId": "com.doit.app",
+    "productName": "Doit",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "public/**/*"
+    ],
+    "icon": "public/logo.png",
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "public/logo.png",
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": true,
+      "createStartMenuShortcut": true,
+      "createDesktopShortcut": "always",
+      "include": "build/installer.nsh"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "public/logo.png",
+      "category": "public.app-category.productivity",
+      "artifactName": "${productName}-mac-${version}.${ext}"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "public/logo.png",
+      "category": "Utility",
+      "artifactName": "${productName}-linux-${version}.${ext}"
+    }
   },
   "devDependencies": {
+    "@types/node": "^26.5.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
+    "concurrently": "^10.0.5",
+    "cross-env": "^10.1.0",
+    "electron": "^44.3.0",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.28.2",
     "typescript": "~6.0.2",
-    "vite": "^8.2.2"
+    "vite": "^8.2.2",
+    "wait-on": "^9.1.0"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
