@@ -3,7 +3,8 @@ import { Plus, Calendar, Clock, X } from 'lucide-react';
 import { useTaskStore } from '../../stores/taskStore';
 import { useUIStore } from '../../stores/uiStore';
 import { useSettingsStore } from '../../stores/settingsStore';
-import { formatDate, formatTime } from '../../utils/dates';
+import { formatDate, formatTime, parseNaturalDateTime } from '../../utils/dates';
+import { parseISO } from 'date-fns';
 
 interface QuickEntryProps {
   defaultDueDate?: string | null;
@@ -35,17 +36,22 @@ export function QuickEntry({ defaultDueDate = null, placeholder = 'What needs to
       const trimmed = value.trim();
       if (!trimmed) return;
 
-      addTask(trimmed, {
-        dueDate: dueDate || null,
-        dueTime: dueTime || null,
+      const natural = parseNaturalDateTime(trimmed, defaultDueDate ? parseISO(defaultDueDate) : new Date());
+      const finalTitle = (natural.detectedText ? natural.cleanTitle : trimmed) || trimmed;
+      const finalDate = dueDate || natural.dueDate || defaultDueDate || null;
+      const finalTime = dueTime || natural.dueTime || null;
+
+      addTask(finalTitle, {
+        dueDate: finalDate,
+        dueTime: finalTime,
       });
 
       setValue('');
       setDueTime(null);
       setDueDate(defaultDueDate);
 
-      const timeMsg = dueTime ? ` at ${formatTime(dueTime, use24h)}` : '';
-      const dateMsg = dueDate ? ` for ${formatDate(dueDate)}` : '';
+      const timeMsg = finalTime ? ` at ${formatTime(finalTime, use24h)}` : '';
+      const dateMsg = finalDate ? ` for ${formatDate(finalDate)}` : '';
       addToast({
         message: `Task created${dateMsg}${timeMsg}`,
         type: 'success',

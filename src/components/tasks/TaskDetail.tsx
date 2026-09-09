@@ -4,7 +4,8 @@ import { useTaskStore } from '../../stores/taskStore';
 import { useUIStore } from '../../stores/uiStore';
 import type { TaskPriority } from '../../types';
 import { PRIORITY_LABELS } from '../../utils/constants';
-import { formatDate } from '../../utils/dates';
+import { formatDate, getTodayStr, getTomorrowStr, toDateStr } from '../../utils/dates';
+import { addWeeks } from 'date-fns';
 
 export function TaskDetail() {
   const { selectedTaskId, closeDetailPanel, addToast } = useUIStore();
@@ -215,6 +216,73 @@ export function TaskDetail() {
               value={task.dueTime || ''}
               onChange={handleDueTimeChange}
             />
+          </div>
+        </div>
+
+        {/* Minimal 1-Click Date & Time Presets */}
+        <div className="detail-quick-presets">
+          <div className="detail-preset-row">
+            <span className="detail-preset-label">Date:</span>
+            <button
+              type="button"
+              className={`detail-preset-chip${task.dueDate === getTodayStr() ? ' active' : ''}`}
+              onClick={() => updateTask(task.id, { dueDate: getTodayStr() })}
+            >
+              Today
+            </button>
+            <button
+              type="button"
+              className={`detail-preset-chip${task.dueDate === getTomorrowStr() ? ' active' : ''}`}
+              onClick={() => updateTask(task.id, { dueDate: getTomorrowStr() })}
+            >
+              Tomorrow
+            </button>
+            <button
+              type="button"
+              className={`detail-preset-chip${task.dueDate === toDateStr(addWeeks(new Date(), 1)) ? ' active' : ''}`}
+              onClick={() => updateTask(task.id, { dueDate: toDateStr(addWeeks(new Date(), 1)) })}
+            >
+              Next Week
+            </button>
+            {task.dueDate && (
+              <button
+                type="button"
+                className="detail-preset-chip chip-clear"
+                onClick={() => updateTask(task.id, { dueDate: null })}
+                title="Remove due date"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+
+          <div className="detail-preset-row">
+            <span className="detail-preset-label">Time:</span>
+            {[
+              { label: '9 AM', time: '09:00' },
+              { label: '1 PM', time: '13:00' },
+              { label: '3 PM', time: '15:00' },
+              { label: '6 PM', time: '18:00' },
+            ].map((p) => (
+              <button
+                key={p.time}
+                type="button"
+                className={`detail-preset-chip${task.dueTime === p.time ? ' active' : ''}`}
+                onClick={() => updateTask(task.id, { dueTime: task.dueTime === p.time ? null : p.time })}
+              >
+                {p.label}
+              </button>
+            ))}
+            {task.dueTime && (
+              <button
+                type="button"
+                className="detail-preset-chip chip-clear"
+                onClick={() => updateTask(task.id, { dueTime: null })}
+                title="Remove due time"
+              >
+                Clear
+              </button>
+            )}
           </div>
         </div>
 

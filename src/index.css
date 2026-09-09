@@ -1324,6 +1324,68 @@ button {
   flex: 1;
 }
 
+.detail-quick-presets {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: -6px;
+  margin-bottom: var(--space-2);
+}
+
+.detail-preset-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.detail-preset-label {
+  font-size: 10px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-width: 36px;
+}
+
+.detail-preset-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  font-size: 10.5px;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.detail-preset-chip:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.detail-preset-chip.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: 0 1px 3px rgba(235, 94, 65, 0.25);
+}
+
+.detail-preset-chip.chip-clear {
+  color: var(--text-tertiary);
+  border-style: dashed;
+}
+
+.detail-preset-chip.chip-clear:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
 /* --- Subtasks in detail --- */
 .subtask-list {
   display: flex;
@@ -2297,6 +2359,145 @@ button {
 
 .time-chip-clear:hover {
   color: var(--text-primary);
+}
+
+.calendar-modal-time-chip.active {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+/* Natural Language Detection Pill */
+.calendar-modal-detected-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  margin-bottom: var(--space-2);
+  background: var(--accent-subtle);
+  border: 1px solid rgba(235, 94, 65, 0.25);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  animation: fadeIn 160ms ease;
+}
+
+.detected-badge-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.detected-badge-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.detected-badge-label {
+  font-weight: var(--font-weight-semibold);
+  color: var(--accent);
+  font-size: 11px;
+}
+
+.detected-badge-tag {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.detected-badge-taskname {
+  color: var(--text-tertiary);
+  font-style: italic;
+  font-size: 11px;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Minimal 1-Click Quick Time & Date Presets */
+.calendar-modal-presets-bar {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border-subtle);
+}
+
+.calendar-preset-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.calendar-preset-label {
+  font-size: 10.5px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  min-width: 46px;
+  flex-shrink: 0;
+}
+
+.calendar-preset-chips-scroll {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.calendar-preset-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2.5px 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+  line-height: 1.3;
+}
+
+.calendar-preset-chip:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background: var(--bg-hover);
+  transform: translateY(-1px);
+}
+
+.calendar-preset-chip:active {
+  transform: translateY(0);
+}
+
+.calendar-preset-chip.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: 0 1px 4px rgba(235, 94, 65, 0.3);
+}
+
+.calendar-preset-chip.active .preset-chip-emoji {
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+}
+
+.preset-chip-emoji {
+  font-size: 11px;
+  line-height: 1;
 }
 
 

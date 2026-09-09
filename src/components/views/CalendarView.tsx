@@ -4,11 +4,15 @@ import {
   X,
   Check,
   Clock,
+  Sparkles,
 } from 'lucide-react';
 import {
   format,
   isToday as isTodayFn,
   isSameDay,
+  addDays,
+  addWeeks,
+  parseISO,
 } from 'date-fns';
 import { useTaskStore } from '../../stores/taskStore';
 import { useUIStore } from '../../stores/uiStore';
@@ -17,10 +21,20 @@ import {
   getCalendarDays,
   getWeekDays,
   toDateStr,
+  formatDate,
   formatTime,
   formatDuration,
+  parseNaturalDateTime,
 } from '../../utils/dates';
 import type { Task } from '../../types';
+
+const QUICK_TIME_PRESETS = [
+  { label12: '9:00 AM', time: '09:00', emoji: '☀️', desc: 'Morning' },
+  { label12: '1:00 PM', time: '13:00', emoji: '🌤️', desc: 'Afternoon' },
+  { label12: '3:00 PM', time: '15:00', emoji: '☕', desc: 'Late Afternoon' },
+  { label12: '6:00 PM', time: '18:00', emoji: '🌙', desc: 'Evening' },
+  { label12: '9:00 PM', time: '21:00', emoji: '🌌', desc: 'Night' },
+];
 
 export function CalendarView() {
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
@@ -106,10 +120,26 @@ export function CalendarView() {
     [addTask, addToast, use24h]
   );
 
+  // Live natural language parser for minimal date & time input
+  const naturalDetected = useMemo(() => {
+    if (!quickTaskTitle.trim()) return null;
+    const parsed = parseNaturalDateTime(quickTaskTitle, selectedDay || new Date());
+    if (parsed.dueDate || parsed.dueTime) {
+      return parsed;
+    }
+    return null;
+  }, [quickTaskTitle, selectedDay]);
+
   const handleModalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedDay || !quickTaskTitle.trim()) return;
-    handleCreateTaskForDay(selectedDay, quickTaskTitle, quickTaskTime);
+
+    const natural = parseNaturalDateTime(quickTaskTitle, selectedDay);
+    const finalTitle = (natural.detectedText ? natural.cleanTitle : quickTaskTitle).trim() || quickTaskTitle.trim();
+    const finalTime = quickTaskTime || natural.dueTime || null;
+    const finalDate = natural.dueDate ? parseISO(natural.dueDate) : selectedDay;
+
+    handleCreateTaskForDay(finalDate, finalTitle, finalTime);
     setQuickTaskTitle('');
     setQuickTaskTime(null);
   };
@@ -418,6 +448,31 @@ export function CalendarView() {
             </div>
 
             <div className="calendar-modal-footer">
+              {/* Natural Language Live Detection Pill */}
+              {naturalDetected && (
+                <div className="calendar-modal-detected-badge" role="status" aria-live="polite">
+                  <div className="detected-badge-left">
+                    <Sparkles size={13} className="detected-badge-icon" />
+                    <span className="detected-badge-label">Detected:</span>
+                    {naturalDetected.dueDate && (
+                      <span className="detected-badge-tag">
+                        📅 {formatDate(naturalDetected.dueDate)}
+                      </span>
+                    )}
+                    {naturalDetected.dueTime && (
+                      <span className="detected-badge-tag">
+                        ⏰ {formatTime(naturalDetected.dueTime, use24h)}
+                      </span>
+                    )}
+                  </div>
+                  {naturalDetected.cleanTitle !== quickTaskTitle.trim() && (
+                    <span className="detected-badge-taskname" title={`Clean title: "${naturalDetected.cleanTitle}"`}>
+                      "{naturalDetected.cleanTitle}"
+                    </span>
+                  )}
+                </div>
+              )}
+
               <form
                 className="calendar-modal-input-form"
                 onSubmit={handleModalSubmit}
@@ -425,21 +480,31 @@ export function CalendarView() {
                 <input
                   type="text"
                   className="calendar-modal-input"
-                  placeholder={`Add a task for ${format(selectedDay, 'MMM d')}...`}
+                  placeholder={`Add a task (e.g., "Meeting tomorrow 3pm")...`}
                   value={quickTaskTitle}
                   onChange={(e) => setQuickTaskTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') {
+                      setSelectedDay(null);
+                      setQuickTaskTitle('');
+                      setQuickTaskTime(null);
+                    }
+                  }}
                   autoFocus
                 />
-                <div className="calendar-modal-time-chip" title="Set optional due time">
+                <div
+                  className={`calendar-modal-time-chip${(quickTaskTime || naturalDetected?.dueTime) ? ' active' : ''}`}
+                  title="Completion time"
+                >
                   <Clock size={13} className="time-chip-icon" />
                   <input
                     type="time"
                     className="calendar-modal-time-input"
-                    value={quickTaskTime || ''}
+                    value={quickTaskTime || naturalDetected?.dueTime || ''}
                     onChange={(e) => setQuickTaskTime(e.target.value || null)}
-                    aria-label="Due time"
+                    aria-label="Completion time"
                   />
-                  {quickTaskTime && (
+                  {(quickTaskTime || naturalDetected?.dueTime) && (
                     <button
                       type="button"
                       className="time-chip-clear"
@@ -459,6 +524,74 @@ export function CalendarView() {
                   Add
                 </button>
               </form>
+
+              {/* Minimal 1-Click Quick Time & Date Presets */}
+              <div className="calendar-modal-presets-bar">
+                {/* 1-Click Time Presets */}
+                <div className="calendar-preset-section">
+                  <span className="calendar-preset-label">Quick Time:</span>
+                  <div className="calendar-preset-chips-scroll">
+                    {QUICK_TIME_PRESETS.map((preset) => {
+                      const isSelected =
+                        quickTaskTime === preset.time ||
+                        (!quickTaskTime && naturalDetected?.dueTime === preset.time);
+                      return (
+                        <button
+                          key={preset.time}
+                          type="button"
+                          className={`calendar-preset-chip${isSelected ? ' active' : ''}`}
+                          onClick={() => {
+                            if (quickTaskTime === preset.time) {
+                              setQuickTaskTime(null);
+                            } else {
+                              setQuickTaskTime(preset.time);
+                            }
+                          }}
+                          title={`${preset.desc} (${preset.label12})`}
+                        >
+                          <span className="preset-chip-emoji">{preset.emoji}</span>
+                          <span>{use24h ? preset.time : preset.label12}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 1-Click Date Shift Chips */}
+                <div className="calendar-preset-section">
+                  <span className="calendar-preset-label">Day:</span>
+                  <div className="calendar-preset-chips-scroll">
+                    <button
+                      type="button"
+                      className={`calendar-preset-chip${isTodayFn(selectedDay) ? ' active' : ''}`}
+                      onClick={() => setSelectedDay(new Date())}
+                    >
+                      Today
+                    </button>
+                    <button
+                      type="button"
+                      className={`calendar-preset-chip${isSameDay(selectedDay, addDays(new Date(), 1)) ? ' active' : ''}`}
+                      onClick={() => setSelectedDay(addDays(new Date(), 1))}
+                    >
+                      Tomorrow
+                    </button>
+                    <button
+                      type="button"
+                      className={`calendar-preset-chip${isSameDay(selectedDay, addDays(new Date(), 2)) ? ' active' : ''}`}
+                      onClick={() => setSelectedDay(addDays(new Date(), 2))}
+                    >
+                      +2 Days
+                    </button>
+                    <button
+                      type="button"
+                      className={`calendar-preset-chip${isSameDay(selectedDay, addWeeks(new Date(), 1)) ? ' active' : ''}`}
+                      onClick={() => setSelectedDay(addWeeks(new Date(), 1))}
+                    >
+                      Next Week
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
