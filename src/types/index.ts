@@ -90,6 +90,7 @@ export interface UserSettings {
   weekStartsOn: 0 | 1;
   timeFormat: TimeFormat;
   reducedMotion: boolean;
+  calendarTaskColor?: string;
 }
 
 // --- Export/Import ---

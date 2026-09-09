@@ -18,6 +18,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   weekStartsOn: 1,
   timeFormat: '12h',
   reducedMotion: false,
+  calendarTaskColor: '#2563EB',
 };
 
 // --- Priority Config ---

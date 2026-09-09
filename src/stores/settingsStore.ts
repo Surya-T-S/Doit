@@ -3,6 +3,62 @@ import type { UserSettings, ThemeMode } from '../types';
 import { DEFAULT_SETTINGS } from '../utils/constants';
 import { loadSettings, saveSettings } from '../services/persistence';
 
+export function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  if (!hex) return null;
+  const cleanHex = hex.replace('#', '').trim();
+  if (cleanHex.length === 3) {
+    const r = parseInt(cleanHex[0] + cleanHex[0], 16);
+    const g = parseInt(cleanHex[1] + cleanHex[1], 16);
+    const b = parseInt(cleanHex[2] + cleanHex[2], 16);
+    if (isNaN(r) || isNaN(g) || isNaN(b)) return null;
+    return { r, g, b };
+  }
+  if (cleanHex.length === 6) {
+    const r = parseInt(cleanHex.substring(0, 2), 16);
+    const g = parseInt(cleanHex.substring(2, 4), 16);
+    const b = parseInt(cleanHex.substring(4, 6), 16);
+    if (isNaN(r) || isNaN(g) || isNaN(b)) return null;
+    return { r, g, b };
+  }
+  return null;
+}
+
+export function rgbToHex(r: number, g: number, b: number): string {
+  const clamp = (val: number) => Math.max(0, Math.min(255, Math.round(val)));
+  return (
+    '#' +
+    [clamp(r), clamp(g), clamp(b)]
+      .map((x) => x.toString(16).padStart(2, '0'))
+      .join('')
+      .toUpperCase()
+  );
+}
+
+export function applyCalendarTaskColor(color: string): void {
+  if (typeof document === 'undefined') return;
+  const root = document.documentElement;
+  const rgb = hexToRgb(color);
+  if (!rgb) return;
+  const { r, g, b } = rgb;
+
+  root.style.setProperty('--calendar-task-color', color);
+  root.style.setProperty('--calendar-task-bg', `rgba(${r}, ${g}, ${b}, 0.15)`);
+  root.style.setProperty('--calendar-task-bg-hover', `rgba(${r}, ${g}, ${b}, 0.24)`);
+
+  const isDark = root.getAttribute('data-theme') === 'dark';
+  if (isDark) {
+    root.style.setProperty(
+      '--calendar-task-text',
+      `rgb(${Math.min(255, Math.round(r * 0.75 + 85))}, ${Math.min(255, Math.round(g * 0.75 + 85))}, ${Math.min(255, Math.round(b * 0.75 + 85))})`
+    );
+  } else {
+    root.style.setProperty(
+      '--calendar-task-text',
+      `rgb(${Math.max(0, Math.round(r * 0.65 - 15))}, ${Math.max(0, Math.round(g * 0.65 - 15))}, ${Math.max(0, Math.round(b * 0.65 - 15))})`
+    );
+  }
+}
+
 interface SettingsState extends UserSettings {
   isLoaded: boolean;
   initialize: () => Promise<void>;
@@ -22,13 +78,22 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     } else {
       set({ isLoaded: true });
     }
-    // Apply theme on init
-    applyTheme(get().theme);
+    // Apply theme and custom calendar task color on init
+    const current = get();
+    applyTheme(current.theme);
+    applyCalendarTaskColor(current.calendarTaskColor || DEFAULT_SETTINGS.calendarTaskColor || '#2563EB');
   },
 
   updateSettings: (updates) => {
     set((state) => {
       const newState = { ...state, ...updates };
+      if (updates.calendarTaskColor) {
+        applyCalendarTaskColor(updates.calendarTaskColor);
+      }
+      if (updates.theme) {
+        applyTheme(updates.theme);
+        applyCalendarTaskColor(newState.calendarTaskColor || '#2563EB');
+      }
       // Persist
       const {
         isLoaded: _,
@@ -46,6 +111,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   setTheme: (theme) => {
     set({ theme });
     applyTheme(theme);
+    applyCalendarTaskColor(get().calendarTaskColor || '#2563EB');
     const state = get();
     const {
       isLoaded: _,
@@ -62,6 +128,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     set({ ...DEFAULT_SETTINGS });
     saveSettings(DEFAULT_SETTINGS);
     applyTheme(DEFAULT_SETTINGS.theme);
+    applyCalendarTaskColor(DEFAULT_SETTINGS.calendarTaskColor || '#2563EB');
   },
 }));
 
@@ -84,9 +151,10 @@ if (typeof window !== 'undefined') {
   window
     .matchMedia('(prefers-color-scheme: dark)')
     .addEventListener('change', () => {
-      const { theme } = useSettingsStore.getState();
+      const { theme, calendarTaskColor } = useSettingsStore.getState();
       if (theme === 'system') {
         applyTheme('system');
+        applyCalendarTaskColor(calendarTaskColor || '#2563EB');
       }
     });
 }

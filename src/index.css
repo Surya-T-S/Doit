@@ -2017,9 +2017,9 @@ button {
   text-overflow: ellipsis;
   cursor: pointer;
   transition: all var(--transition-fast);
-  border-left: 3px solid var(--accent);
-  background: var(--accent-subtle);
-  color: var(--accent-text);
+  border-left: 3px solid var(--calendar-task-color, var(--accent));
+  background: var(--calendar-task-bg, var(--accent-subtle));
+  color: var(--calendar-task-text, var(--accent-text));
   box-sizing: border-box;
 }
 
@@ -2141,6 +2141,7 @@ button {
   padding: var(--space-2) var(--space-3);
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--calendar-task-color, var(--border-subtle));
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -2151,11 +2152,13 @@ button {
 
 .calendar-week-card:hover {
   border-color: var(--border-default);
+  border-left-color: var(--calendar-task-color, var(--border-strong));
   background: var(--bg-hover);
   box-shadow: var(--shadow-sm);
 }
 
 .calendar-week-card.completed {
+  border-left-color: var(--border-default);
   opacity: 0.65;
 }
 
@@ -3799,4 +3802,265 @@ button {
   z-index: 3;
   user-select: none;
 }
+
+/* ==========================================================================
+   Settings - RGB Calendar Task Color Picker
+   ========================================================================== */
+
+.color-picker-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.color-picker-top-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.color-swatch-wrapper {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border-default);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.color-swatch-wrapper:hover {
+  transform: scale(1.05);
+  border-color: var(--border-strong);
+}
+
+.color-native-input {
+  position: absolute;
+  inset: -10px;
+  width: 200%;
+  height: 200%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.color-hex-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 6px 10px;
+  flex: 1;
+}
+
+.color-hex-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+.color-hex-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.color-reset-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.color-reset-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* RGB Number Inputs Group */
+.rgb-channels-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.rgb-channel-box {
+  display: flex;
+  align-items: center;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 5px 8px;
+  gap: 6px;
+}
+
+.rgb-channel-label {
+  font-size: 11px;
+  font-weight: 700;
+  width: 14px;
+}
+
+.rgb-channel-label.r { color: #ef4444; }
+.rgb-channel-label.g { color: #10b981; }
+.rgb-channel-label.b { color: #3b82f6; }
+
+.rgb-channel-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: right;
+  -moz-appearance: textfield;
+}
+
+.rgb-channel-input::-webkit-outer-spin-button,
+.rgb-channel-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* RGB Sliders */
+.rgb-sliders-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rgb-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rgb-slider-tag {
+  font-size: 11px;
+  font-weight: 700;
+  width: 12px;
+}
+
+.rgb-slider-tag.r { color: #ef4444; }
+.rgb-slider-tag.g { color: #10b981; }
+.rgb-slider-tag.b { color: #3b82f6; }
+
+.rgb-range-slider {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.rgb-range-slider.slider-r {
+  background: linear-gradient(to right, #000000, #ef4444);
+}
+
+.rgb-range-slider.slider-g {
+  background: linear-gradient(to right, #000000, #10b981);
+}
+
+.rgb-range-slider.slider-b {
+  background: linear-gradient(to right, #000000, #3b82f6);
+}
+
+.rgb-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--border-strong);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.rgb-range-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Quick Palette Presets */
+.color-presets-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 2px;
+}
+
+.color-preset-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.color-preset-dot:hover {
+  transform: scale(1.2);
+}
+
+.color-preset-dot.active {
+  border-color: #ffffff;
+  outline: 2px solid var(--text-primary);
+  transform: scale(1.15);
+}
+
+/* Live Preview Box */
+.color-live-preview-box {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.color-live-preview-title {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+}
+
+.color-live-preview-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 500;
+  width: fit-content;
+  max-width: 100%;
+}
+
 

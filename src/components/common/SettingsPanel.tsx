@@ -1,11 +1,211 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useMemo } from 'react';
 import { X, Download, Upload, Trash2 } from 'lucide-react';
 import { useUIStore } from '../../stores/uiStore';
-import { useSettingsStore } from '../../stores/settingsStore';
+import { useSettingsStore, hexToRgb, rgbToHex } from '../../stores/settingsStore';
 import { useTaskStore } from '../../stores/taskStore';
 import { exportData, exportCSV, importData } from '../../services/exportImport';
 import { clearAllData, saveTasks, saveSettings } from '../../services/persistence';
 import type { ThemeMode } from '../../types';
+
+const PRESET_COLORS = [
+  { name: 'Royal Blue', hex: '#2563EB' },
+  { name: 'Warm Coral', hex: '#EB5E41' },
+  { name: 'Emerald Green', hex: '#10B981' },
+  { name: 'Vivid Violet', hex: '#8B5CF6' },
+  { name: 'Amber Gold', hex: '#F59E0B' },
+  { name: 'Rose Pink', hex: '#EC4899' },
+  { name: 'Cyan Teal', hex: '#06B6D4' },
+  { name: 'Slate Grey', hex: '#64748B' },
+];
+
+function TaskColorPicker() {
+  const settings = useSettingsStore();
+  const currentColor = settings.calendarTaskColor || '#2563EB';
+
+  const rgb = useMemo(() => hexToRgb(currentColor) || { r: 37, g: 99, b: 235 }, [currentColor]);
+
+  const updateColor = (newHex: string) => {
+    settings.updateSettings({ calendarTaskColor: newHex });
+  };
+
+  const handleRgbChange = (channel: 'r' | 'g' | 'b', val: number) => {
+    const clamped = Math.max(0, Math.min(255, isNaN(val) ? 0 : val));
+    const newR = channel === 'r' ? clamped : rgb.r;
+    const newG = channel === 'g' ? clamped : rgb.g;
+    const newB = channel === 'b' ? clamped : rgb.b;
+    updateColor(rgbToHex(newR, newG, newB));
+  };
+
+  // Compute contrast text for live preview chip
+  const isDark =
+    settings.theme === 'dark' ||
+    (settings.theme === 'system' &&
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+  const previewTextColor = isDark
+    ? `rgb(${Math.min(255, Math.round(rgb.r * 0.75 + 85))}, ${Math.min(255, Math.round(rgb.g * 0.75 + 85))}, ${Math.min(255, Math.round(rgb.b * 0.75 + 85))})`
+    : `rgb(${Math.max(0, Math.round(rgb.r * 0.65 - 15))}, ${Math.max(0, Math.round(rgb.g * 0.65 - 15))}, ${Math.max(0, Math.round(rgb.b * 0.65 - 15))})`;
+
+  return (
+    <div className="color-picker-card">
+      {/* Top Row: Color Swatch + Hex Input + Reset */}
+      <div className="color-picker-top-row">
+        <label
+          className="color-swatch-wrapper"
+          style={{ backgroundColor: currentColor }}
+          title="Click to open color picker"
+        >
+          <input
+            type="color"
+            value={currentColor}
+            onChange={(e) => updateColor(e.target.value)}
+            className="color-native-input"
+            aria-label="Pick color"
+          />
+        </label>
+
+        <div className="color-hex-box">
+          <span className="color-hex-label">HEX</span>
+          <input
+            type="text"
+            className="color-hex-input"
+            value={currentColor}
+            onChange={(e) => {
+              const val = e.target.value.trim();
+              if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+                updateColor(val);
+              }
+            }}
+            placeholder="#2563EB"
+            maxLength={7}
+            aria-label="Hex color code"
+          />
+        </div>
+
+        <button
+          type="button"
+          className="color-reset-btn"
+          onClick={() => updateColor('#2563EB')}
+          title="Reset to default theme color"
+        >
+          Reset
+        </button>
+      </div>
+
+      {/* RGB Channel Number Inputs */}
+      <div className="rgb-channels-grid">
+        <div className="rgb-channel-box">
+          <span className="rgb-channel-label r">R</span>
+          <input
+            type="number"
+            min={0}
+            max={255}
+            value={rgb.r}
+            onChange={(e) => handleRgbChange('r', parseInt(e.target.value, 10))}
+            className="rgb-channel-input"
+            aria-label="Red value"
+          />
+        </div>
+        <div className="rgb-channel-box">
+          <span className="rgb-channel-label g">G</span>
+          <input
+            type="number"
+            min={0}
+            max={255}
+            value={rgb.g}
+            onChange={(e) => handleRgbChange('g', parseInt(e.target.value, 10))}
+            className="rgb-channel-input"
+            aria-label="Green value"
+          />
+        </div>
+        <div className="rgb-channel-box">
+          <span className="rgb-channel-label b">B</span>
+          <input
+            type="number"
+            min={0}
+            max={255}
+            value={rgb.b}
+            onChange={(e) => handleRgbChange('b', parseInt(e.target.value, 10))}
+            className="rgb-channel-input"
+            aria-label="Blue value"
+          />
+        </div>
+      </div>
+
+      {/* RGB Range Sliders */}
+      <div className="rgb-sliders-col">
+        <div className="rgb-slider-row">
+          <span className="rgb-slider-tag r">R</span>
+          <input
+            type="range"
+            min={0}
+            max={255}
+            value={rgb.r}
+            onChange={(e) => handleRgbChange('r', parseInt(e.target.value, 10))}
+            className="rgb-range-slider slider-r"
+            aria-label="Red channel slider"
+          />
+        </div>
+        <div className="rgb-slider-row">
+          <span className="rgb-slider-tag g">G</span>
+          <input
+            type="range"
+            min={0}
+            max={255}
+            value={rgb.g}
+            onChange={(e) => handleRgbChange('g', parseInt(e.target.value, 10))}
+            className="rgb-range-slider slider-g"
+            aria-label="Green channel slider"
+          />
+        </div>
+        <div className="rgb-slider-row">
+          <span className="rgb-slider-tag b">B</span>
+          <input
+            type="range"
+            min={0}
+            max={255}
+            value={rgb.b}
+            onChange={(e) => handleRgbChange('b', parseInt(e.target.value, 10))}
+            className="rgb-range-slider slider-b"
+            aria-label="Blue channel slider"
+          />
+        </div>
+      </div>
+
+      {/* Quick Color Presets */}
+      <div className="color-presets-row">
+        {PRESET_COLORS.map((preset) => (
+          <button
+            key={preset.hex}
+            type="button"
+            className={`color-preset-dot${currentColor.toLowerCase() === preset.hex.toLowerCase() ? ' active' : ''}`}
+            style={{ backgroundColor: preset.hex }}
+            onClick={() => updateColor(preset.hex)}
+            title={preset.name}
+            aria-label={preset.name}
+          />
+        ))}
+      </div>
+
+      {/* Live Calendar Task Preview */}
+      <div className="color-live-preview-box">
+        <span className="color-live-preview-title">Calendar Task Live Preview</span>
+        <div
+          className="color-live-preview-chip"
+          style={{
+            borderLeft: `3px solid ${currentColor}`,
+            backgroundColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15)`,
+            color: previewTextColor,
+          }}
+        >
+          <span style={{ fontSize: '10px', fontWeight: 700, opacity: 0.85 }}>09:30</span>
+          <span>Sample Calendar Task</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function SettingsPanel() {
   const { setSettingsOpen, addToast } = useUIStore();
@@ -102,6 +302,17 @@ export function SettingsPanel() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Calendar Task Color with RGB Color Picker */}
+            <div style={{ marginTop: 'var(--space-4)' }}>
+              <div>
+                <div className="settings-row-label">Calendar task color</div>
+                <div className="settings-row-description">
+                  Customize the color of tasks displayed across month and week calendar views
+                </div>
+              </div>
+              <TaskColorPicker />
             </div>
           </div>
 

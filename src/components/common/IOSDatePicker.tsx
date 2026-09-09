@@ -284,7 +284,6 @@ export function IOSDatePicker({
           </div>
         ) : (
           <div className="ios-picked-date-badge">
-            <span className="ios-picked-date-icon">📅</span>
             <span className="ios-picked-date-text">{formattedPickedDate}</span>
           </div>
         )}
