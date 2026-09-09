@@ -135,58 +135,63 @@ export function TaskRow({ task, isDraggable = false }: TaskRowProps) {
       <div className="task-content">
         <span className="task-title">{task.title}</span>
 
-        <div className="task-meta">
-          {/* Prominent Schedule Badge (Date & Time) */}
-          {(task.dueDate || task.dueTime) && (
-            <span
-              className={`task-schedule-badge${taskOverdue ? ' overdue' : ''}${taskDueToday ? ' due-today' : ''}`}
-            >
-              <Calendar size={12} className="schedule-icon" />
-              <span className="schedule-date">
-                {task.dueDate ? formatDate(task.dueDate) : 'Today'}
+        {/* Compact inline extras (tags, duration, subtasks) */}
+        {(totalSubtasks > 0 || task.tags.length > 0 || task.estimatedDuration) && (
+          <div className="task-inline-extras">
+            {task.estimatedDuration && (
+              <span className="task-meta-item duration-pill" title="Duration">
+                <Clock size={10} className="meta-icon" />
+                <span>{task.estimatedDuration}m</span>
               </span>
-              {task.dueTime && (
-                <>
-                  <span className="schedule-sep">·</span>
-                  <Clock size={11} className="schedule-icon" />
-                  <span className="schedule-time">{formatTime(task.dueTime, use24h)}</span>
-                </>
-              )}
-            </span>
-          )}
+            )}
 
-          {task.estimatedDuration && (
-            <span className="task-meta-item duration-pill">
-              <Clock size={11} className="meta-icon" />
-              <span>{task.estimatedDuration}m</span>
-            </span>
-          )}
+            {task.tags.length > 0 && (
+              <span className="task-meta-item tags-group">
+                <Tag size={10} className="meta-icon" />
+                {task.tags.slice(0, 2).map((tag) => (
+                  <span key={tag} className="task-tag">{tag}</span>
+                ))}
+                {task.tags.length > 2 && (
+                  <span className="task-tag">+{task.tags.length - 2}</span>
+                )}
+              </span>
+            )}
 
-          {task.tags.length > 0 && (
-            <span className="task-meta-item tags-group">
-              <Tag size={11} className="meta-icon" />
-              {task.tags.slice(0, 2).map((tag) => (
-                <span key={tag} className="task-tag">{tag}</span>
-              ))}
-              {task.tags.length > 2 && (
-                <span className="task-tag">+{task.tags.length - 2}</span>
-              )}
-            </span>
-          )}
-
-          {totalSubtasks > 0 && (
-            <span className="task-subtask-progress">
-              <div className="subtask-bar">
-                <div
-                  className="subtask-bar-fill"
-                  style={{ width: `${(completedSubtasks / totalSubtasks) * 100}%` }}
-                />
-              </div>
-              <span>{completedSubtasks}/{totalSubtasks}</span>
-            </span>
-          )}
-        </div>
+            {totalSubtasks > 0 && (
+              <span className="task-subtask-progress" title={`${completedSubtasks}/${totalSubtasks} subtasks`}>
+                <div className="subtask-bar">
+                  <div
+                    className="subtask-bar-fill"
+                    style={{ width: `${(completedSubtasks / totalSubtasks) * 100}%` }}
+                  />
+                </div>
+                <span>{completedSubtasks}/{totalSubtasks}</span>
+              </span>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* Right-aligned Date & Time Badge - Non-intrusive, prominent, space-efficient */}
+      {(task.dueDate || task.dueTime) && (
+        <div className="task-schedule-wrap">
+          <span
+            className={`task-schedule-badge${taskOverdue ? ' overdue' : ''}${taskDueToday ? ' due-today' : ''}`}
+          >
+            <Calendar size={11} className="schedule-icon" />
+            <span className="schedule-date">
+              {task.dueDate ? formatDate(task.dueDate) : 'Today'}
+            </span>
+            {task.dueTime && (
+              <>
+                <span className="schedule-sep">·</span>
+                <Clock size={11} className="schedule-icon" />
+                <span className="schedule-time">{formatTime(task.dueTime, use24h)}</span>
+              </>
+            )}
+          </span>
+        </div>
+      )}
 
       <div className="task-actions">
         <button

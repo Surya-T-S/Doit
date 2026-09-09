@@ -478,85 +478,54 @@ button {
    ============================================================ */
 
 /* --- Quick Entry --- */
-.quick-entry-card {
-  margin-bottom: var(--space-6);
+.quick-entry-bar {
+  display: flex;
+  align-items: center;
   background: var(--bg-primary);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
+  padding: 4px 6px 4px var(--space-4);
+  gap: var(--space-2);
+  min-height: 44px;
+  margin-bottom: var(--space-4);
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-fast);
-  overflow: hidden;
 }
 
-.quick-entry-card.focused {
+.quick-entry-bar.focused {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-subtle), var(--shadow-md);
-}
-
-.quick-entry-main {
-  display: flex;
-  align-items: center;
-  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-4);
-  gap: var(--space-2);
 }
 
 .quick-entry-input {
   flex: 1;
   border: none;
   background: none;
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
   color: var(--text-primary);
-  padding: var(--space-2) 0;
+  padding: var(--space-1) 0;
   outline: none;
+  min-width: 140px;
 }
 
 .quick-entry-input::placeholder {
   color: var(--text-tertiary);
 }
 
-.quick-entry-submit-btn {
-  display: inline-flex;
+.quick-entry-inline-actions {
+  display: flex;
   align-items: center;
-  gap: var(--space-1);
-  padding: 6px 14px;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  border-radius: var(--radius-md);
+  gap: 6px;
   flex-shrink: 0;
 }
 
-.quick-entry-submit-btn .key-hint {
-  opacity: 0.6;
-  margin-left: 2px;
-}
-
-.quick-entry-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-2) var(--space-4);
-  background: var(--bg-secondary);
-  border-top: 1px solid var(--border-subtle);
-  font-size: var(--font-size-xs);
-  gap: var(--space-3);
-  flex-wrap: wrap;
-}
-
-.quick-entry-meta-group {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-}
-
-.quick-pill-picker {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
+.quick-chip-wrapper {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.quick-meta-chip {
+.quick-inline-chip {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -564,36 +533,37 @@ button {
   font-size: 11px;
   font-weight: var(--font-weight-medium);
   color: var(--text-secondary);
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-full);
   cursor: pointer;
   position: relative;
   transition: all var(--transition-fast);
+  white-space: nowrap;
 }
 
-.quick-meta-chip:hover {
+.quick-inline-chip:hover {
   color: var(--text-primary);
   border-color: var(--border-hover);
   background: var(--bg-hover);
 }
 
-.quick-meta-chip.active {
+.quick-inline-chip.active {
   color: var(--accent-text);
   background: var(--accent-subtle);
   border-color: var(--accent);
   font-weight: var(--font-weight-semibold);
 }
 
-.quick-meta-chip .chip-icon {
+.quick-inline-chip .chip-icon {
   color: var(--text-tertiary);
 }
 
-.quick-meta-chip.active .chip-icon {
+.quick-inline-chip.active .chip-icon {
   color: var(--accent);
 }
 
-.quick-hidden-input {
+.quick-native-hidden-input {
   position: absolute;
   inset: 0;
   opacity: 0;
@@ -602,31 +572,7 @@ button {
   cursor: pointer;
 }
 
-.quick-preset-pill {
-  padding: 3px 8px;
-  font-size: 11px;
-  color: var(--text-tertiary);
-  background: none;
-  border: 1px solid transparent;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.quick-preset-pill:hover {
-  color: var(--text-primary);
-  background: var(--bg-primary);
-  border-color: var(--border-default);
-}
-
-.quick-preset-pill.selected {
-  color: var(--accent-text);
-  background: var(--accent-subtle);
-  border-color: var(--accent);
-  font-weight: var(--font-weight-semibold);
-}
-
-.quick-clear-btn {
+.quick-chip-clear {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -638,38 +584,38 @@ button {
   background: none;
   cursor: pointer;
   transition: all var(--transition-fast);
+  margin-left: -2px;
 }
 
-.quick-clear-btn:hover {
+.quick-chip-clear:hover {
   color: var(--danger);
   background: var(--danger-subtle);
 }
 
-.quick-toolbar-separator {
-  width: 1px;
-  height: 14px;
-  background: var(--border-default);
-  margin: 0 var(--space-1);
-}
-
-.quick-entry-shortcut-hint {
-  color: var(--text-tertiary);
-  font-size: 11px;
-  display: flex;
+.quick-entry-btn-add {
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  margin-left: auto;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
 }
 
-.quick-entry-shortcut-hint kbd {
-  display: inline-block;
-  padding: 1px 4px;
-  font-size: 10px;
-  font-family: inherit;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
+.quick-entry-btn-add:hover {
+  background: var(--accent-hover);
+  transform: scale(1.04);
+}
+
+.quick-entry-btn-add:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* --- Sort Toolbar --- */
@@ -787,37 +733,36 @@ button {
 .task-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 6px;
 }
 
-/* --- Task Row as Visible, Focused Card --- */
+/* --- Task Row as Visible, Focused, Compact Card --- */
 .task-row {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
+  padding: 8px var(--space-3);
   background: var(--bg-primary);
   border: 1px solid var(--border-default);
-  border-left: 4px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border-left: 3px solid var(--border-subtle);
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-fast);
   position: relative;
-  min-height: 52px;
-  box-shadow: var(--shadow-sm);
+  min-height: 42px;
+  box-shadow: var(--shadow-xs);
 }
 
 .task-row:hover {
   background: var(--bg-hover);
   border-color: var(--border-hover);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .task-row.selected {
   border-color: var(--accent);
   background: var(--bg-primary);
-  box-shadow: 0 0 0 2px var(--accent-subtle), var(--shadow-md);
+  box-shadow: 0 0 0 2px var(--accent-subtle);
 }
 
 .task-row.dragging {
@@ -865,7 +810,6 @@ button {
 
 .task-row.completed:hover {
   opacity: 0.85;
-  transform: none;
 }
 
 .task-drag-handle {
@@ -879,7 +823,7 @@ button {
   cursor: grab;
   flex-shrink: 0;
   transition: opacity var(--transition-fast);
-  margin-left: -4px;
+  margin-left: -2px;
 }
 
 .task-row:hover .task-drag-handle {
@@ -890,11 +834,11 @@ button {
   cursor: grabbing;
 }
 
-/* Checkbox - More visible, tactile */
+/* Checkbox - Tactile, clean */
 .task-checkbox {
   position: relative;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
 }
 
@@ -908,10 +852,10 @@ button {
 }
 
 .task-checkbox-visual {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--checkbox-border);
-  border-radius: 6px;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--checkbox-border);
+  border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -930,8 +874,8 @@ button {
 }
 
 .task-checkbox-visual .check-icon {
-  width: 13px;
-  height: 13px;
+  width: 12px;
+  height: 12px;
   color: white;
   opacity: 0;
   transform: scale(0.5);
@@ -945,33 +889,35 @@ button {
 
 /* Priority dot */
 .task-priority-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: var(--radius-full);
   flex-shrink: 0;
 }
 
-.task-priority-dot.urgent { background: var(--priority-urgent); box-shadow: 0 0 6px rgba(239, 68, 68, 0.4); }
-.task-priority-dot.high { background: var(--priority-high); box-shadow: 0 0 6px rgba(245, 158, 11, 0.4); }
+.task-priority-dot.urgent { background: var(--priority-urgent); }
+.task-priority-dot.high { background: var(--priority-high); }
 .task-priority-dot.medium { background: var(--priority-medium); }
 .task-priority-dot.low { background: var(--priority-low); }
 .task-priority-dot.none { display: none; }
 
-/* Task content - High contrast, focused typography */
+/* Task content - Single line flex with inline extras */
 .task-content {
   flex: 1;
   min-width: 0;
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .task-title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: var(--font-weight-medium);
   color: var(--text-primary);
   line-height: 1.35;
-  word-break: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   letter-spacing: -0.01em;
 }
 
@@ -981,25 +927,34 @@ button {
   text-decoration-color: var(--text-tertiary);
 }
 
-.task-meta {
-  display: flex;
+.task-inline-extras {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
-/* Schedule Badge (Due Date + Time) - Very visible and focused */
+/* Schedule Wrap (Right-aligned Date & Time) */
+.task-schedule-wrap {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Schedule Badge (Due Date + Time) - Compact, clean, prominent */
 .task-schedule-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 8px;
+  padding: 2px 7px;
   font-size: 11px;
   font-weight: var(--font-weight-medium);
   color: var(--text-secondary);
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
+  white-space: nowrap;
   transition: all var(--transition-fast);
 }
 
@@ -1009,13 +964,14 @@ button {
 }
 
 .task-schedule-badge .schedule-sep {
-  opacity: 0.5;
+  opacity: 0.4;
+  margin: 0 1px;
 }
 
 .task-schedule-badge.due-today {
   color: var(--accent-text);
   background: var(--accent-subtle);
-  border-color: rgba(59, 130, 246, 0.25);
+  border-color: rgba(59, 130, 246, 0.2);
   font-weight: var(--font-weight-semibold);
 }
 
@@ -1025,8 +981,8 @@ button {
 
 .task-schedule-badge.overdue {
   color: var(--danger);
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.25);
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.2);
   font-weight: var(--font-weight-semibold);
 }
 
@@ -1035,48 +991,50 @@ button {
 }
 
 .task-meta-item {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 3px;
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-tertiary);
 }
 
 .task-meta-item .meta-icon {
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
   flex-shrink: 0;
 }
 
 .duration-pill {
-  padding: 1px 6px;
-  background: var(--bg-tertiary);
+  padding: 1px 5px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .task-tag {
   display: inline-flex;
   align-items: center;
-  padding: 1px 6px;
+  padding: 1px 5px;
   font-size: 10px;
   font-weight: var(--font-weight-medium);
   color: var(--text-secondary);
-  background: var(--bg-tertiary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
 }
 
 .task-subtask-progress {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 11px;
+  gap: 3px;
+  font-size: 10px;
   color: var(--text-tertiary);
 }
 
 .subtask-bar {
-  width: 36px;
+  width: 28px;
   height: 3px;
   background: var(--bg-tertiary);
   border-radius: var(--radius-full);
@@ -1093,7 +1051,7 @@ button {
 .task-actions {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: 2px;
   opacity: 0;
   transition: opacity var(--transition-fast);
   flex-shrink: 0;
@@ -1107,9 +1065,9 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-md);
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
   color: var(--text-tertiary);
   transition: all var(--transition-fast);
   border: none;
@@ -1128,8 +1086,8 @@ button {
 }
 
 .task-action-btn .action-icon {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
 }
 
 /* ============================================================
@@ -2223,37 +2181,37 @@ button {
    ============================================================ */
 
 .today-greeting {
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-3);
 }
 
 .today-date {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   color: var(--text-tertiary);
-  margin-bottom: var(--space-1);
+  margin-bottom: 2px;
 }
 
 .today-title {
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 
 .today-summary {
   display: flex;
-  gap: var(--space-6);
-  margin-bottom: var(--space-8);
+  gap: var(--space-5);
+  margin-bottom: var(--space-4);
   flex-wrap: wrap;
 }
 
 .today-stat {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: 2px;
 }
 
 .today-stat-value {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
   letter-spacing: -0.02em;
@@ -2265,7 +2223,7 @@ button {
 }
 
 .today-section {
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-5);
 }
 
 .today-section-title {
