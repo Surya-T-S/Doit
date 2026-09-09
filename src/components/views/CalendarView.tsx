@@ -4,13 +4,10 @@ import {
   X,
   Check,
   Clock,
-  Calendar as CalendarIcon,
 } from 'lucide-react';
 import {
   format,
   isToday as isTodayFn,
-  isSameDay,
-  addWeeks,
   parseISO,
 } from 'date-fns';
 import { useTaskStore } from '../../stores/taskStore';
@@ -21,27 +18,18 @@ import {
   getWeekDays,
   toDateStr,
   getTodayStr,
-  getTomorrowStr,
   formatDate,
   formatTime,
   formatDuration,
   parseNaturalDateTime,
 } from '../../utils/dates';
 import type { Task } from '../../types';
-
-const TIME_SELECTION_OPTIONS = [
-  { label12: '9:00 AM', time: '09:00' },
-  { label12: '12:00 PM', time: '12:00' },
-  { label12: '3:00 PM', time: '15:00' },
-  { label12: '6:00 PM', time: '18:00' },
-  { label12: '9:00 PM', time: '21:00' },
-];
+import { IOSDatePicker } from '../common/IOSDatePicker';
 
 export function CalendarView() {
-  // New Task Dialog State (Task Name, Description, Date, Time - all selection based)
+  // New Task Dialog State (Task Name, Date, Time like iPhone)
   const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
-  const [taskDescription, setTaskDescription] = useState('');
   const [taskDueDate, setTaskDueDate] = useState<string>(getTodayStr());
   const [taskDueTime, setTaskDueTime] = useState<string | null>(null);
 
@@ -59,11 +47,18 @@ export function CalendarView() {
   const year = calendarDate.getFullYear();
   const month = calendarDate.getMonth();
 
+  // Track whether modal was opened for a specific clicked calendar day
+  const [isSpecificDateSelected, setIsSpecificDateSelected] = useState(false);
+
   const openNewTaskModal = useCallback((date?: Date) => {
-    const targetDate = date || new Date();
-    setTaskDueDate(toDateStr(targetDate));
+    if (date) {
+      setTaskDueDate(toDateStr(date));
+      setIsSpecificDateSelected(true);
+    } else {
+      setTaskDueDate(getTodayStr());
+      setIsSpecificDateSelected(false);
+    }
     setTaskTitle('');
-    setTaskDescription('');
     setTaskDueTime(null);
     setIsNewTaskOpen(true);
     setViewingDayTasks(null);
@@ -151,8 +146,8 @@ export function CalendarView() {
     }
   };
 
-  const handleCreateNewTask = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCreateNewTask = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     const trimmedTitle = taskTitle.trim();
     if (!trimmedTitle) return;
 
@@ -162,7 +157,6 @@ export function CalendarView() {
     const finalTime = taskDueTime || parsed.dueTime || null;
 
     addTask(finalTitle, {
-      description: taskDescription.trim(),
       dueDate: finalDate,
       dueTime: finalTime,
     });
@@ -176,7 +170,6 @@ export function CalendarView() {
 
     setIsNewTaskOpen(false);
     setTaskTitle('');
-    setTaskDescription('');
     setTaskDueTime(null);
   };
 
@@ -377,183 +370,64 @@ export function CalendarView() {
         </div>
       )}
 
-      {/* Minimal New Task Modal — Only Task Name, Description, Date, Time (selection-based, matching theme, no emojis) */}
+      {/* High-Quality iPhone Style New Task Modal */}
       {isNewTaskOpen && (
         <div
           className="calendar-modal-overlay"
           onClick={() => setIsNewTaskOpen(false)}
         >
           <div
-            className="new-task-modal"
+            className="ios-modal"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
           >
-            <div className="new-task-modal-header">
-              <h3 className="new-task-modal-title">New Task</h3>
+            <div className="ios-modal-header">
               <button
                 type="button"
-                className="calendar-modal-close"
+                className="ios-header-cancel-btn"
                 onClick={() => setIsNewTaskOpen(false)}
-                aria-label="Close"
               >
-                <X size={16} />
+                Cancel
+              </button>
+              <h3 className="ios-header-title">New Task</h3>
+              <button
+                type="button"
+                className="ios-header-add-btn"
+                disabled={!taskTitle.trim()}
+                onClick={() => handleCreateNewTask()}
+              >
+                Add
               </button>
             </div>
 
-            <form onSubmit={handleCreateNewTask} className="new-task-form">
-              <div className="new-task-form-body">
-                {/* 1. Task Name */}
-                <div className="new-task-field">
-                  <label className="new-task-label">Task Name</label>
-                  <input
-                    type="text"
-                    className="new-task-input"
-                    placeholder="What needs to be done?"
-                    value={taskTitle}
-                    onChange={(e) => handleTitleChange(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Escape') setIsNewTaskOpen(false);
-                    }}
-                    autoFocus
-                    required
-                  />
-                </div>
-
-                {/* 2. Description */}
-                <div className="new-task-field">
-                  <label className="new-task-label">Description</label>
-                  <textarea
-                    className="new-task-textarea"
-                    placeholder="Add description (optional)..."
-                    rows={2}
-                    value={taskDescription}
-                    onChange={(e) => setTaskDescription(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Escape') setIsNewTaskOpen(false);
-                      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-                        handleCreateNewTask(e);
-                      }
-                    }}
-                  />
-                </div>
-
-                {/* 3. Date (Selection Based, no emojis) */}
-                <div className="new-task-field">
-                  <label className="new-task-label">Date</label>
-                  <div className="new-task-selection-row">
-                    <button
-                      type="button"
-                      className={`new-task-chip${taskDueDate === getTodayStr() ? ' active' : ''}`}
-                      onClick={() => setTaskDueDate(getTodayStr())}
-                    >
-                      Today
-                    </button>
-                    <button
-                      type="button"
-                      className={`new-task-chip${taskDueDate === getTomorrowStr() ? ' active' : ''}`}
-                      onClick={() => setTaskDueDate(getTomorrowStr())}
-                    >
-                      Tomorrow
-                    </button>
-                    <button
-                      type="button"
-                      className={`new-task-chip${taskDueDate === toDateStr(addWeeks(new Date(), 1)) ? ' active' : ''}`}
-                      onClick={() => setTaskDueDate(toDateStr(addWeeks(new Date(), 1)))}
-                    >
-                      Next Week
-                    </button>
-
-                    <div
-                      className={`new-task-picker-chip${
-                        taskDueDate &&
-                        taskDueDate !== getTodayStr() &&
-                        taskDueDate !== getTomorrowStr() &&
-                        taskDueDate !== toDateStr(addWeeks(new Date(), 1))
-                          ? ' active'
-                          : ''
-                      }`}
-                      title="Choose specific date"
-                    >
-                      <CalendarIcon size={12} className="picker-icon" />
-                      <input
-                        type="date"
-                        className="new-task-picker-input"
-                        value={taskDueDate}
-                        onChange={(e) => setTaskDueDate(e.target.value || getTodayStr())}
-                        aria-label="Select date"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* 4. Time (Selection Based, NO emojis) */}
-                <div className="new-task-field">
-                  <label className="new-task-label">Time</label>
-                  <div className="new-task-selection-row">
-                    {TIME_SELECTION_OPTIONS.map((opt) => {
-                      const isSelected = taskDueTime === opt.time;
-                      return (
-                        <button
-                          key={opt.time}
-                          type="button"
-                          className={`new-task-chip${isSelected ? ' active' : ''}`}
-                          onClick={() => setTaskDueTime(isSelected ? null : opt.time)}
-                        >
-                          {use24h ? opt.time : opt.label12}
-                        </button>
-                      );
-                    })}
-
-                    <div
-                      className={`new-task-picker-chip${
-                        taskDueTime && !TIME_SELECTION_OPTIONS.some((o) => o.time === taskDueTime)
-                          ? ' active'
-                          : ''
-                      }`}
-                      title="Custom time"
-                    >
-                      <Clock size={12} className="picker-icon" />
-                      <input
-                        type="time"
-                        className="new-task-picker-input"
-                        value={taskDueTime || ''}
-                        onChange={(e) => setTaskDueTime(e.target.value || null)}
-                        aria-label="Select custom time"
-                      />
-                    </div>
-
-                    {taskDueTime && (
-                      <button
-                        type="button"
-                        className="new-task-chip chip-clear"
-                        onClick={() => setTaskDueTime(null)}
-                        title="Clear time"
-                      >
-                        Clear
-                      </button>
-                    )}
-                  </div>
-                </div>
+            <form onSubmit={handleCreateNewTask} className="ios-modal-body">
+              {/* Task Title Input */}
+              <div className="ios-title-card">
+                <input
+                  type="text"
+                  className="ios-title-input"
+                  placeholder="Task Name"
+                  value={taskTitle}
+                  onChange={(e) => handleTitleChange(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') setIsNewTaskOpen(false);
+                    if (e.key === 'Enter') handleCreateNewTask(e);
+                  }}
+                  autoFocus
+                  required
+                />
               </div>
 
-              {/* Actions */}
-              <div className="new-task-modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-sm"
-                  onClick={() => setIsNewTaskOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary btn-sm"
-                  disabled={!taskTitle.trim()}
-                >
-                  Create Task
-                </button>
-              </div>
+              {/* iPhone Date and Time Selector */}
+              <IOSDatePicker
+                selectedDate={taskDueDate}
+                onDateChange={setTaskDueDate}
+                selectedTime={taskDueTime}
+                onTimeChange={setTaskDueTime}
+                use24h={use24h}
+                showQuickPresets={!isSpecificDateSelected}
+              />
             </form>
           </div>
         </div>
