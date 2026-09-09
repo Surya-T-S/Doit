@@ -1,19 +1,17 @@
 import React, { useMemo } from 'react';
-import { format } from 'date-fns';
 import { useTaskStore } from '../../stores/taskStore';
+import { useSettingsStore } from '../../stores/settingsStore';
 import { getTodayTasks } from '../../services/filter';
 import { TaskRow } from '../tasks/TaskRow';
 import { QuickEntry } from '../tasks/QuickEntry';
-import { DayCapacityBar } from '../layout/DayCapacityBar';
 import { EmptyState } from '../tasks/EmptyState';
-import { formatDuration, isOverdue, isDueToday } from '../../utils/dates';
+import { formatDuration } from '../../utils/dates';
 
 export function TodayView() {
   const tasks = useTaskStore((s) => s.tasks);
+  const dailyCapacity = useSettingsStore((s) => s.dailyCapacityMinutes);
 
   const todayStr = new Date().toISOString().split('T')[0];
-  const dayName = format(new Date(), 'EEEE');
-  const dateStr = format(new Date(), 'MMMM d, yyyy');
 
   const { today, overdue } = useMemo(() => getTodayTasks(tasks), [tasks]);
 
@@ -34,36 +32,44 @@ export function TodayView() {
     0
   );
 
+  const capacityPct = dailyCapacity > 0 ? Math.min((totalEstimated / dailyCapacity) * 100, 100) : 0;
+  const isOverloaded = totalEstimated > dailyCapacity;
+
   return (
     <div className="content-area">
-      {/* Greeting */}
-      <div className="today-greeting">
-        <p className="today-date">{dateStr}</p>
-        <h2 className="today-title">{dayName}</h2>
-      </div>
-
-      {/* Summary Stats */}
-      <div className="today-summary">
-        <div className="today-stat">
-          <span className="today-stat-value">{allTodayTasks.length}</span>
-          <span className="today-stat-label">tasks</span>
-        </div>
-        {overdue.length > 0 && (
-          <div className="today-stat">
-            <span className="today-stat-value" style={{ color: 'var(--danger)' }}>
-              {overdue.length}
+      {/* Sleek compact toolbar: task count, overdue, done, and inline capacity */}
+      <div className="today-metrics-bar">
+        <div className="today-metrics-pills">
+          <span className="today-metric-pill">
+            <strong>{allTodayTasks.length}</strong> {allTodayTasks.length === 1 ? 'task' : 'tasks'}
+          </span>
+          {overdue.length > 0 && (
+            <span className="today-metric-pill overdue">
+              <strong>{overdue.length}</strong> overdue
             </span>
-            <span className="today-stat-label">overdue</span>
-          </div>
-        )}
-        <div className="today-stat">
-          <span className="today-stat-value">{completedToday.length}</span>
-          <span className="today-stat-label">done</span>
+          )}
+          {completedToday.length > 0 && (
+            <span className="today-metric-pill completed">
+              <strong>{completedToday.length}</strong> done
+            </span>
+          )}
         </div>
+
         {totalEstimated > 0 && (
-          <div className="today-stat">
-            <span className="today-stat-value">{formatDuration(totalEstimated)}</span>
-            <span className="today-stat-label">planned</span>
+          <div
+            className={`today-capacity-compact${isOverloaded ? ' overloaded' : ''}`}
+            title={`${formatDuration(totalEstimated)} planned of ${formatDuration(dailyCapacity)} available`}
+          >
+            <span className="capacity-text">
+              {formatDuration(totalEstimated)}
+              <span className="capacity-max"> / {formatDuration(dailyCapacity)}</span>
+            </span>
+            <div className="capacity-mini-bar">
+              <div
+                className={`capacity-mini-fill${isOverloaded ? ' danger' : ''}`}
+                style={{ width: `${Math.min(capacityPct, 100)}%` }}
+              />
+            </div>
           </div>
         )}
       </div>
@@ -75,7 +81,7 @@ export function TodayView() {
       {overdue.length > 0 && (
         <div className="today-section">
           <div className="today-section-title">
-            Overdue
+            <span>Overdue</span>
             <span className="overdue-badge">{overdue.length}</span>
           </div>
           <div className="task-list" role="list">
@@ -88,7 +94,10 @@ export function TodayView() {
 
       {/* Today's Tasks */}
       <div className="today-section">
-        <div className="today-section-title">Today</div>
+        <div className="today-section-title">
+          <span>Today</span>
+          {today.length > 0 && <span className="today-count-badge">{today.length}</span>}
+        </div>
         {today.length === 0 && overdue.length === 0 ? (
           <EmptyState type="today" />
         ) : today.length === 0 ? null : (
@@ -102,12 +111,10 @@ export function TodayView() {
 
       {/* Completed Today */}
       {completedToday.length > 0 && (
-        <div className="today-section">
+        <div className="today-section completed-section">
           <div className="today-section-title">
-            Completed Today
-            <span style={{ color: 'var(--success)', fontWeight: 400, textTransform: 'none', letterSpacing: 'normal' }}>
-              {completedToday.length}
-            </span>
+            <span>Completed Today</span>
+            <span className="completed-badge">{completedToday.length}</span>
           </div>
           <div className="task-list" role="list">
             {completedToday.map((task) => (
@@ -116,9 +123,6 @@ export function TodayView() {
           </div>
         </div>
       )}
-
-      {/* Day Capacity */}
-      <DayCapacityBar />
     </div>
   );
 }

@@ -430,22 +430,75 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-4) var(--space-6);
+  padding: var(--space-3) var(--space-6);
   height: var(--header-height);
   flex-shrink: 0;
   border-bottom: 1px solid var(--border-subtle);
+}
+
+.main-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.main-header-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  min-width: 0;
 }
 
 .main-header-title {
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.main-header-date-badge {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  font-weight: var(--font-weight-normal);
+  white-space: nowrap;
 }
 
 .main-header-actions {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+}
+
+.main-header-clock {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+.main-header-clock:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-default);
+  color: var(--text-primary);
+}
+
+.header-clock-icon {
+  color: var(--accent);
+  opacity: 0.85;
+}
+
+.header-clock-text {
+  letter-spacing: 0.02em;
 }
 
 .main-body {
@@ -2180,46 +2233,103 @@ button {
    Today View
    ============================================================ */
 
-.today-greeting {
-  margin-bottom: var(--space-3);
-}
-
-.today-date {
-  font-size: var(--font-size-xs);
-  color: var(--text-tertiary);
-  margin-bottom: 2px;
-}
-
-.today-title {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
-}
-
-.today-summary {
+.today-metrics-bar {
   display: flex;
-  gap: var(--space-5);
-  margin-bottom: var(--space-4);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+  padding: 2px 0;
+  gap: var(--space-3);
   flex-wrap: wrap;
 }
 
-.today-stat {
+.today-metrics-pills {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
 }
 
-.today-stat-value {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
-}
-
-.today-stat-label {
+.today-metric-pill {
   font-size: var(--font-size-xs);
   color: var(--text-tertiary);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.today-metric-pill strong {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.today-metric-pill.overdue {
+  color: var(--danger);
+  background: var(--danger-subtle);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.today-metric-pill.overdue strong {
+  color: var(--danger);
+}
+
+.today-metric-pill.completed {
+  color: var(--success);
+  background: var(--success-subtle);
+  border-color: rgba(34, 197, 94, 0.25);
+}
+
+.today-metric-pill.completed strong {
+  color: var(--success);
+}
+
+.today-capacity-compact {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+.today-capacity-compact .capacity-text {
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+}
+
+.today-capacity-compact .capacity-max {
+  color: var(--text-tertiary);
+  font-weight: var(--font-weight-normal);
+}
+
+.today-capacity-compact .capacity-mini-bar {
+  width: 48px;
+  height: 4px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.today-capacity-compact .capacity-mini-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-normal);
+}
+
+.today-capacity-compact .capacity-mini-fill.danger {
+  background: var(--danger);
+}
+
+.today-capacity-compact.overloaded {
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
 .today-section {
@@ -2232,10 +2342,29 @@ button {
   color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-2);
   display: flex;
   align-items: center;
   gap: var(--space-2);
+}
+
+.today-count-badge,
+.completed-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-tertiary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+}
+
+.completed-badge {
+  color: var(--success);
+  background: var(--success-subtle);
+  border-color: rgba(34, 197, 94, 0.2);
 }
 
 .overdue-badge {

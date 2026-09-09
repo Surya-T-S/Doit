@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
-import { Search, Menu, Command } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Search, Menu, Command, Clock } from 'lucide-react';
+import { format } from 'date-fns';
 import { useTaskStore } from './stores/taskStore';
 import { useUIStore } from './stores/uiStore';
 import { useSettingsStore } from './stores/settingsStore';
@@ -53,6 +54,18 @@ function App() {
     init();
   }, [initTasks, initSettings]);
 
+  const timeFormat = useSettingsStore((s) => s.timeFormat);
+  const use24h = timeFormat === '24h';
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Keep live time updated
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   // Keyboard shortcuts
   useKeyboardShortcuts();
 
@@ -105,9 +118,9 @@ function App() {
 
       {/* Main Content */}
       <div className="main-content">
-        {/* Header */}
+        {/* Header with natural Day, Date, and Live Time placement */}
         <header className="main-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+          <div className="main-header-left">
             <button
               className="mobile-menu-btn"
               onClick={() => setSidebarOpen(true)}
@@ -115,10 +128,26 @@ function App() {
             >
               <Menu size={20} />
             </button>
-            <h2 className="main-header-title">{viewTitles[currentView]}</h2>
+            <div className="main-header-title-group">
+              <h2 className="main-header-title">{viewTitles[currentView]}</h2>
+              <span className="main-header-date-badge">
+                {format(currentTime, currentView === 'today' ? 'EEEE, MMMM d' : 'EEE, MMM d')}
+              </span>
+            </div>
           </div>
 
           <div className="main-header-actions">
+            {/* Live Clock pill */}
+            <div
+              className="main-header-clock"
+              title={`Current time: ${format(currentTime, use24h ? 'HH:mm:ss' : 'h:mm:ss a')}`}
+            >
+              <Clock size={12} className="header-clock-icon" />
+              <span className="header-clock-text">
+                {format(currentTime, use24h ? 'HH:mm' : 'h:mm a')}
+              </span>
+            </div>
+
             {/* Search */}
             {searchOpen ? (
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
