@@ -382,7 +382,7 @@ export function TaskDetail() {
                     <input
                       type="checkbox"
                       checked={subtask.completed}
-                      onChange={() => {}}
+                      onChange={() => { }}
                       tabIndex={-1}
                     />
                     <div className="subtask-checkbox-visual">

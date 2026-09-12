@@ -235,10 +235,10 @@ export function CalendarView() {
                       task.priority === 'urgent'
                         ? 'urgent'
                         : task.priority === 'high'
-                        ? 'high'
-                        : isCompleted
-                        ? 'completed'
-                        : 'normal';
+                          ? 'high'
+                          : isCompleted
+                            ? 'completed'
+                            : 'normal';
 
                     return (
                       <div
@@ -330,7 +330,7 @@ export function CalendarView() {
                             <input
                               type="checkbox"
                               checked={isCompleted}
-                              onChange={() => {}}
+                              onChange={() => { }}
                               tabIndex={-1}
                             />
                             <div className="task-checkbox-visual" style={{ width: 16, height: 16 }}>
@@ -487,7 +487,7 @@ export function CalendarView() {
                       <input
                         type="checkbox"
                         checked={isCompleted}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         tabIndex={-1}
                       />
                       <div className="task-checkbox-visual">

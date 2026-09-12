@@ -19,13 +19,20 @@
 :root {
   /* Typography */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  --font-size-xs: 0.75rem;    /* 12px */
-  --font-size-sm: 0.8125rem;  /* 13px */
-  --font-size-base: 0.875rem; /* 14px */
-  --font-size-md: 1rem;       /* 16px */
-  --font-size-lg: 1.25rem;    /* 20px */
-  --font-size-xl: 1.5rem;     /* 24px */
-  --font-size-2xl: 2rem;      /* 32px */
+  --font-size-xs: 0.75rem;
+  /* 12px */
+  --font-size-sm: 0.8125rem;
+  /* 13px */
+  --font-size-base: 0.875rem;
+  /* 14px */
+  --font-size-md: 1rem;
+  /* 16px */
+  --font-size-lg: 1.25rem;
+  /* 20px */
+  --font-size-xl: 1.5rem;
+  /* 24px */
+  --font-size-2xl: 2rem;
+  /* 32px */
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -34,16 +41,26 @@
   --line-height-relaxed: 1.6;
 
   /* Spacing */
-  --space-1: 0.25rem;   /* 4px */
-  --space-2: 0.5rem;    /* 8px */
-  --space-3: 0.75rem;   /* 12px */
-  --space-4: 1rem;      /* 16px */
-  --space-5: 1.25rem;   /* 20px */
-  --space-6: 1.5rem;    /* 24px */
-  --space-8: 2rem;      /* 32px */
-  --space-10: 2.5rem;   /* 40px */
-  --space-12: 3rem;     /* 48px */
-  --space-16: 4rem;     /* 64px */
+  --space-1: 0.25rem;
+  /* 4px */
+  --space-2: 0.5rem;
+  /* 8px */
+  --space-3: 0.75rem;
+  /* 12px */
+  --space-4: 1rem;
+  /* 16px */
+  --space-5: 1.25rem;
+  /* 20px */
+  --space-6: 1.5rem;
+  /* 24px */
+  --space-8: 2rem;
+  /* 32px */
+  --space-10: 2.5rem;
+  /* 40px */
+  --space-12: 3rem;
+  /* 48px */
+  --space-16: 4rem;
+  /* 64px */
 
   /* Radii */
   --radius-sm: 4px;
@@ -273,6 +290,7 @@ button {
 
 /* --- Reduced Motion --- */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -965,7 +983,7 @@ button {
   background: var(--accent-subtle);
 }
 
-.task-checkbox input:checked + .task-checkbox-visual {
+.task-checkbox input:checked+.task-checkbox-visual {
   background: var(--checkbox-checked-bg);
   border-color: var(--checkbox-checked);
 }
@@ -979,7 +997,7 @@ button {
   transition: all var(--transition-fast);
 }
 
-.task-checkbox input:checked + .task-checkbox-visual .check-icon {
+.task-checkbox input:checked+.task-checkbox-visual .check-icon {
   opacity: 1;
   transform: scale(1);
 }
@@ -992,11 +1010,25 @@ button {
   flex-shrink: 0;
 }
 
-.task-priority-dot.urgent { background: var(--priority-urgent); }
-.task-priority-dot.high { background: var(--priority-high); }
-.task-priority-dot.medium { background: var(--priority-medium); }
-.task-priority-dot.low { background: var(--priority-low); }
-.task-priority-dot.none { display: none; }
+.task-priority-dot.urgent {
+  background: var(--priority-urgent);
+}
+
+.task-priority-dot.high {
+  background: var(--priority-high);
+}
+
+.task-priority-dot.medium {
+  background: var(--priority-medium);
+}
+
+.task-priority-dot.low {
+  background: var(--priority-low);
+}
+
+.task-priority-dot.none {
+  display: none;
+}
 
 /* Task content - Single line flex with inline extras */
 .task-content {
@@ -1208,6 +1240,7 @@ button {
     transform: translateX(20px);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -1445,7 +1478,7 @@ button {
   transition: all var(--transition-fast);
 }
 
-.subtask-checkbox input:checked + .subtask-checkbox-visual {
+.subtask-checkbox input:checked+.subtask-checkbox-visual {
   background: var(--checkbox-checked-bg);
   border-color: var(--checkbox-checked);
 }
@@ -1458,7 +1491,7 @@ button {
   transition: opacity var(--transition-fast);
 }
 
-.subtask-checkbox input:checked + .subtask-checkbox-visual .check-icon {
+.subtask-checkbox input:checked+.subtask-checkbox-visual .check-icon {
   opacity: 1;
 }
 
@@ -1610,8 +1643,13 @@ button {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .command-palette {
@@ -1630,6 +1668,7 @@ button {
     transform: scale(0.97);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
@@ -2402,6 +2441,7 @@ button {
     opacity: 0;
     transform: scale(0.94) translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -2622,23 +2662,19 @@ button {
   inset: 0;
   pointer-events: none;
   z-index: 2;
-  background: linear-gradient(
-    to bottom,
-    var(--bg-primary) 0%,
-    rgba(255, 255, 255, 0) 25%,
-    rgba(255, 255, 255, 0) 75%,
-    var(--bg-primary) 100%
-  );
+  background: linear-gradient(to bottom,
+      var(--bg-primary) 0%,
+      rgba(255, 255, 255, 0) 25%,
+      rgba(255, 255, 255, 0) 75%,
+      var(--bg-primary) 100%);
 }
 
 [data-theme="dark"] .ios-wheels-mask {
-  background: linear-gradient(
-    to bottom,
-    var(--bg-primary) 0%,
-    rgba(0, 0, 0, 0) 25%,
-    rgba(0, 0, 0, 0) 75%,
-    var(--bg-primary) 100%
-  );
+  background: linear-gradient(to bottom,
+      var(--bg-primary) 0%,
+      rgba(0, 0, 0, 0) 25%,
+      rgba(0, 0, 0, 0) 75%,
+      var(--bg-primary) 100%);
 }
 
 /* Individual Wheel Column */
@@ -2989,7 +3025,7 @@ button {
   padding: var(--space-3) 0;
 }
 
-.settings-row + .settings-row {
+.settings-row+.settings-row {
   border-top: 1px solid var(--border-subtle);
 }
 
@@ -3103,7 +3139,7 @@ button {
   transition: background var(--transition-fast);
 }
 
-.toggle input:checked + .toggle-track {
+.toggle input:checked+.toggle-track {
   background: var(--accent);
 }
 
@@ -3120,7 +3156,7 @@ button {
   pointer-events: none;
 }
 
-.toggle input:checked ~ .toggle-thumb {
+.toggle input:checked~.toggle-thumb {
   transform: translateX(16px);
 }
 
@@ -3189,6 +3225,7 @@ button {
     transform: translateY(8px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -3466,6 +3503,7 @@ button {
     opacity: 0;
     transform: scale(0.96) translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -3724,13 +3762,11 @@ button {
   inset: 0;
   pointer-events: none;
   z-index: 2;
-  background: linear-gradient(
-    to bottom,
-    var(--bg-primary) 0%,
-    rgba(0, 0, 0, 0) 30%,
-    rgba(0, 0, 0, 0) 70%,
-    var(--bg-primary) 100%
-  );
+  background: linear-gradient(to bottom,
+      var(--bg-primary) 0%,
+      rgba(0, 0, 0, 0) 30%,
+      rgba(0, 0, 0, 0) 70%,
+      var(--bg-primary) 100%);
 }
 
 /* Individual Column with Ultra Smooth Momentum Scrolling */
@@ -3932,9 +3968,17 @@ button {
   width: 14px;
 }
 
-.rgb-channel-label.r { color: #ef4444; }
-.rgb-channel-label.g { color: #10b981; }
-.rgb-channel-label.b { color: #3b82f6; }
+.rgb-channel-label.r {
+  color: #ef4444;
+}
+
+.rgb-channel-label.g {
+  color: #10b981;
+}
+
+.rgb-channel-label.b {
+  color: #3b82f6;
+}
 
 .rgb-channel-input {
   width: 100%;
@@ -3973,9 +4017,17 @@ button {
   width: 12px;
 }
 
-.rgb-slider-tag.r { color: #ef4444; }
-.rgb-slider-tag.g { color: #10b981; }
-.rgb-slider-tag.b { color: #3b82f6; }
+.rgb-slider-tag.r {
+  color: #ef4444;
+}
+
+.rgb-slider-tag.g {
+  color: #10b981;
+}
+
+.rgb-slider-tag.b {
+  color: #3b82f6;
+}
 
 .rgb-range-slider {
   flex: 1;
@@ -4006,7 +4058,7 @@ button {
   border-radius: 50%;
   background: #ffffff;
   border: 2px solid var(--border-strong);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   transition: transform 0.1s ease;
 }
@@ -4030,7 +4082,7 @@ button {
   border-radius: 50%;
   border: 2px solid transparent;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   transition: transform 0.15s ease, border-color 0.15s ease;
 }
 
@@ -4074,5 +4126,3 @@ button {
   width: fit-content;
   max-width: 100%;
 }
-
-
