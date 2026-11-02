@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/logo.png" alt="Doit Logo" width="80" height="80" />
+<img src="public/logo.png" alt="Doit Logo" width="100%" />
 
 # Doit
 
@@ -18,13 +18,12 @@ An offline-first, distraction-free desktop personal planner built for focus.
 
 ### Why Doit?
 
-Most planners overload you with menus, tags, and cloud syncs. **Doit** strips away the friction:
-
-* ⚡ **Natural Input** — Type tasks, dates, and times naturally.
-* 📅 **Unified View** — Daily capacity planning and calendar in a single glance. No endless scrolling.
-* 🎨 **Clean Palette** — Minimalist design with custom accent themes.
-* 🔒 **100% Private & Local** — Zero telemetry, zero accounts. Your data lives on your disk.
-* ⌨️ **Keyboard First** — Fast command palette with `Ctrl + K` / `Cmd + K`.
+*  **Calendar & Week** — Unified time-blocking and capacity planning in a single glance.
+*  **Clean Palette** — Minimalist design with customizable accent themes.
+*  **100% Private & Local** — Zero tracking, zero external accounts. Your data never leaves your disk.
+*  **Keyboard First** — Fast navigation and command palette (`Ctrl + K` / `Cmd + K`).
+*  **Import & Export (JSON & CSV)** — Full ownership of your data with instant backup and restore.
+*  **Very Fast** — Instant startup, responsive interactions, and zero cloud latency.
 
 ---
 
@@ -50,4 +49,3 @@ npm run electron:dev
 <div align="center">
 <sub>Crafted with focus by Surya T S</sub>
 </div>
-
