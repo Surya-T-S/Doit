@@ -63,7 +63,13 @@ let toastCounter = 0;
 
 export const useUIStore = create<UIState>((set) => ({
   currentView: 'calendar',
-  setView: (view) => set({ currentView: view, sidebarOpen: false }),
+  setView: (view) =>
+    set({
+      currentView: view,
+      sidebarOpen: false,
+      // Search is only available in All Tasks; clear it when leaving
+      ...(view !== 'all' ? { searchOpen: false, searchQuery: '' } : {}),
+    }),
 
   calendarDate: new Date(),
   setCalendarDate: (date) =>
@@ -85,7 +91,13 @@ export const useUIStore = create<UIState>((set) => ({
   searchQuery: '',
   setSearchQuery: (query) => set({ searchQuery: query }),
   searchOpen: false,
-  setSearchOpen: (open) => set({ searchOpen: open, searchQuery: open ? '' : '' }),
+  // Opening search always switches to All Tasks (search lives only there)
+  setSearchOpen: (open) =>
+    set(
+      open
+        ? { searchOpen: true, searchQuery: '', currentView: 'all' }
+        : { searchOpen: false, searchQuery: '' }
+    ),
 
   commandPaletteOpen: false,
   setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
@@ -93,12 +105,12 @@ export const useUIStore = create<UIState>((set) => ({
   activeFilter: 'all',
   setActiveFilter: (filter) => set({ activeFilter: filter }),
 
-  sortMode: 'custom',
+  sortMode: 'dueDate',
   sortDirection: 'asc',
   setSortMode: (mode) => set({ sortMode: mode }),
   setSortDirection: (direction) => set({ sortDirection: direction }),
 
-  showCompleted: true,
+  showCompleted: false,
   toggleShowCompleted: () =>
     set((state) => ({ showCompleted: !state.showCompleted })),
 

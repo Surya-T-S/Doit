@@ -3,7 +3,8 @@ import type { TaskPriority, UserSettings } from '../types';
 // --- App Constants ---
 
 export const APP_NAME = 'Doit';
-export const APP_VERSION = '1.0.0';
+// Injected at build time from package.json "version" (see vite.config.ts)
+export const APP_VERSION: string = __APP_VERSION__;
 export const DATA_VERSION = 1;
 
 // --- Default Settings ---
@@ -12,13 +13,14 @@ export const DEFAULT_SETTINGS: UserSettings = {
   theme: 'system',
   dailyCapacityMinutes: 480, // 8 hours
   defaultView: 'calendar',
-  sortMode: 'custom',
+  sortMode: 'dueDate',
   sortDirection: 'asc',
   showCompletedTasks: true,
   weekStartsOn: 1,
   timeFormat: '12h',
   reducedMotion: false,
   calendarTaskColor: '#2563EB',
+  useTaskColorForAccent: true,
 };
 
 // --- Priority Config ---

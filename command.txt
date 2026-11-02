@@ -50,12 +50,12 @@ After running `npm run release`, artifacts are arranged in:
 
   release/
   ├── windows/
-  │   ├── Doit-Setup-1.0.0.exe      <- Windows NSIS Installer (~109 MB)
+  │   ├── Doit-Setup-1.0.1.exe      <- Windows NSIS Installer (~109 MB)
   │   └── win-unpacked/             <- Unpacked Windows binaries for instant testing
   │
   ├── linux/
-  │   ├── Doit-linux-1.0.0.zip      <- Linux standalone zip package (~118 MB)
-  │   ├── Doit-linux-1.0.0.tar.gz   <- Linux tar.gz archive (~117 MB)
+  │   ├── Doit-linux-1.0.1.zip      <- Linux standalone zip package (~118 MB)
+  │   ├── Doit-linux-1.0.1.tar.gz   <- Linux tar.gz archive (~117 MB)
   │   └── linux-unpacked/           <- Unpacked Linux binaries
   │
   ├── macos/

@@ -206,15 +206,26 @@ export function CalendarView() {
                 onClick={() => openNewTaskModal(day)}
               >
                 <div className="calendar-day-header-row">
-                  {isToday ? (
-                    <span className="calendar-today-badge">{day.getDate()}</span>
-                  ) : (
-                    <span
-                      className={`calendar-day-num${isFirstDay ? ' month-start' : ''}`}
-                    >
-                      {isFirstDay ? format(day, 'MMM 1') : day.getDate()}
-                    </span>
-                  )}
+                  <button
+                    type="button"
+                    className="calendar-date-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setViewingDayTasks(day);
+                    }}
+                    title={`View tasks for ${format(day, 'MMM d')}`}
+                    aria-label={`View tasks for ${format(day, 'MMMM d, yyyy')}`}
+                  >
+                    {isToday ? (
+                      <span className="calendar-today-badge">{day.getDate()}</span>
+                    ) : (
+                      <span
+                        className={`calendar-day-num${isFirstDay ? ' month-start' : ''}`}
+                      >
+                        {isFirstDay ? format(day, 'MMM 1') : day.getDate()}
+                      </span>
+                    )}
+                  </button>
 
                   <button
                     className="calendar-quick-add-btn"
@@ -298,13 +309,24 @@ export function CalendarView() {
                   <span className="calendar-week-col-name">
                     {format(day, 'EEE')}
                   </span>
-                  {isToday ? (
-                    <span className="calendar-today-badge">{day.getDate()}</span>
-                  ) : (
-                    <span className="calendar-day-num" style={{ fontSize: '14px', fontWeight: 600 }}>
-                      {day.getDate()}
-                    </span>
-                  )}
+                  <button
+                    type="button"
+                    className="calendar-date-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setViewingDayTasks(day);
+                    }}
+                    title={`View tasks for ${format(day, 'MMM d')}`}
+                    aria-label={`View tasks for ${format(day, 'MMMM d, yyyy')}`}
+                  >
+                    {isToday ? (
+                      <span className="calendar-today-badge">{day.getDate()}</span>
+                    ) : (
+                      <span className="calendar-day-num" style={{ fontSize: '14px', fontWeight: 600 }}>
+                        {day.getDate()}
+                      </span>
+                    )}
+                  </button>
                 </div>
 
                 <div className="calendar-week-col-tasks">
@@ -433,7 +455,7 @@ export function CalendarView() {
         </div>
       )}
 
-      {/* Day Schedule View (Only when clicking "+X more" on a busy month day) */}
+      {/* Day Schedule View (opened by clicking a date number or "+X more") */}
       {viewingDayTasks && (
         <div
           className="calendar-modal-overlay"
@@ -464,6 +486,9 @@ export function CalendarView() {
             </div>
 
             <div className="calendar-modal-body">
+              {(tasksByDate[toDateStr(viewingDayTasks)] || []).length === 0 && (
+                <div className="calendar-modal-empty">No tasks scheduled for this day</div>
+              )}
               {(tasksByDate[toDateStr(viewingDayTasks)] || []).map((task) => {
                 const isCompleted = task.status === 'completed';
                 return (

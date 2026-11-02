@@ -6,6 +6,7 @@ import { useTaskStore } from '../../stores/taskStore';
 import { exportData, exportCSV, importData } from '../../services/exportImport';
 import { clearAllData, saveTasks, saveSettings } from '../../services/persistence';
 import type { ThemeMode } from '../../types';
+import { APP_VERSION } from '../../utils/constants';
 
 const PRESET_COLORS = [
   { name: 'Royal Blue', hex: '#2563EB' },
@@ -313,37 +314,28 @@ export function SettingsPanel() {
                 </div>
               </div>
               <TaskColorPicker />
+
+              <label className="settings-checkbox-row">
+                <input
+                  type="checkbox"
+                  checked={settings.useTaskColorForAccent ?? true}
+                  onChange={(e) =>
+                    settings.updateSettings({ useTaskColorForAccent: e.target.checked })
+                  }
+                />
+                <span>
+                  <span className="settings-row-label">Use the same color for buttons etc.</span>
+                  <span className="settings-row-description" style={{ display: 'block' }}>
+                    Apply the task color to buttons, toggles, checkboxes, highlights and focus rings
+                  </span>
+                </span>
+              </label>
             </div>
           </div>
 
           {/* Planning */}
           <div className="settings-section">
             <h3 className="settings-section-title">Planning</h3>
-            <div className="settings-row">
-              <div>
-                <div className="settings-row-label">Daily capacity</div>
-                <div className="settings-row-description">
-                  How many hours of planned work per day
-                </div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                <input
-                  className="detail-input"
-                  type="number"
-                  min={1}
-                  max={24}
-                  value={settings.dailyCapacityMinutes / 60}
-                  onChange={(e) =>
-                    settings.updateSettings({
-                      dailyCapacityMinutes: Math.max(60, parseInt(e.target.value) * 60 || 480),
-                    })
-                  }
-                  style={{ width: 60 }}
-                />
-                <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--text-tertiary)' }}>hours</span>
-              </div>
-            </div>
-
             <div className="settings-row">
               <div>
                 <div className="settings-row-label">Week starts on</div>
@@ -468,7 +460,7 @@ export function SettingsPanel() {
 
         <div className="settings-footer">
           <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-tertiary)' }}>
-            Doit v1.0 · Local-first · Privacy-first
+            Doit v{APP_VERSION} · Local-first · Privacy-first
           </span>
           <button className="btn btn-ghost btn-sm" onClick={close}>
             Done

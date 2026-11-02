@@ -91,6 +91,8 @@ export interface UserSettings {
   timeFormat: TimeFormat;
   reducedMotion: boolean;
   calendarTaskColor?: string;
+  /** When true, the task color is also used as the app-wide accent (buttons, toggles, etc.) */
+  useTaskColorForAccent?: boolean;
 }
 
 // --- Export/Import ---

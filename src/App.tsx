@@ -217,7 +217,7 @@ function App() {
                   onClick={() =>
                     window.dispatchEvent(
                       new CustomEvent('open-calendar-new-task', {
-                        detail: { date: calendarDate },
+                        detail: { date: new Date() },
                       })
                     )
                   }
@@ -241,13 +241,13 @@ function App() {
               </span>
             </div>
 
-            {/* Search */}
-            {searchOpen ? (
+            {/* Search (All Tasks only) */}
+            {currentView !== 'all' ? null : searchOpen ? (
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                 <Search size={14} style={{ position: 'absolute', left: 10, color: 'var(--text-tertiary)' }} />
                 <input
                   autoFocus
-                  className="detail-input"
+                  className="detail-input header-search-input"
                   style={{ paddingLeft: 30, width: 200 }}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}

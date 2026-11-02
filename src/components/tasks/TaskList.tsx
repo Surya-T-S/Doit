@@ -29,18 +29,20 @@ export function TaskList() {
     toggleShowCompleted,
   } = useUIStore();
 
+  // Subscribe to tasks so the list updates immediately on add/update/delete
+  const tasks = useTaskStore((s) => s.tasks);
   const getPendingTasks = useTaskStore((s) => s.getPendingTasks);
   const getCompletedTasks = useTaskStore((s) => s.getCompletedTasks);
   const reorderTasks = useTaskStore((s) => s.reorderTasks);
 
   const pendingTasks = useMemo(
     () => getPendingTasks(sortMode, sortDirection, activeFilter, searchQuery),
-    [getPendingTasks, sortMode, sortDirection, activeFilter, searchQuery]
+    [tasks, getPendingTasks, sortMode, sortDirection, activeFilter, searchQuery]
   );
 
   const completedTasks = useMemo(
     () => getCompletedTasks(searchQuery),
-    [getCompletedTasks, searchQuery]
+    [tasks, getCompletedTasks, searchQuery]
   );
 
   const isDraggable = sortMode === 'custom' && activeFilter === 'all' && !searchQuery;

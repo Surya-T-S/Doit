@@ -1100,7 +1100,7 @@ button {
 .task-schedule-badge.due-today {
   color: var(--accent-text);
   background: var(--accent-subtle);
-  border-color: rgba(59, 130, 246, 0.2);
+  border-color: color-mix(in srgb, var(--accent) 20%, transparent);
   font-weight: var(--font-weight-semibold);
 }
 
@@ -4125,4 +4125,77 @@ button {
   font-weight: 500;
   width: fit-content;
   max-width: 100%;
+}
+
+
+/* Clickable calendar date number (opens day tasks popup) */
+.calendar-date-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  transition: background 0.15s ease;
+}
+
+.calendar-date-btn:hover {
+  background: var(--bg-hover);
+}
+
+.calendar-date-btn:hover .calendar-day-num {
+  color: var(--accent);
+}
+
+.calendar-date-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.calendar-modal-empty {
+  padding: var(--space-5) 0;
+  text-align: center;
+  color: var(--text-tertiary, var(--text-secondary));
+  font-size: 13px;
+}
+
+/* Remove blue focus ring on the command palette input and header search */
+.command-input:focus,
+.command-input:focus-visible,
+.header-search-input:focus,
+.header-search-input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.header-search-input:focus,
+.header-search-input:focus-visible {
+  border-color: var(--border-default);
+}
+
+/* Settings: "use task color for buttons" checkbox row */
+.settings-checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  user-select: none;
+}
+
+.settings-checkbox-row input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
 }
