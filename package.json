@@ -69,8 +69,6 @@
       ],
       "icon": "public/logo.png",
       "category": "Utility",
-      "desktopName": "doit.desktop",
-      "syncDesktopName": true,
       "artifactName": "${productName}-linux-${version}.${ext}"
     }
   },
@@ -96,5 +94,6 @@
     "lucide-react": "^1.43.0",
     "nanoid": "^5.1.16",
     "zustand": "^5.0.15"
-  }
+  },
+  "desktopName": "doit.desktop"
 }
