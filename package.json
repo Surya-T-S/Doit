@@ -65,7 +65,8 @@
     "linux": {
       "target": [
         "AppImage",
-        "deb"
+        "deb",
+        "snap"
       ],
       "icon": "public/logo.png",
       "category": "Utility",
