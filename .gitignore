@@ -10,6 +10,7 @@ dist-electron/
 release/
 build/*
 !build/installer.nsh
+!build/icon.png
 *.tsbuildinfo
 *.blockmap
 

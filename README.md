@@ -43,16 +43,20 @@ Grab the latest version for your platform from [**GitHub Releases**](https://git
 3. Drag **Doit** into your `Applications` folder (or your dedicated Doit folder).
 4. Launch Doit from Spotlight or Launchpad.
 
-####  Linux
-* **AppImage** (Runs on any distribution):
+#### 🐧 Linux
+
+* **Debian / Ubuntu (`.deb`)** — ⭐ *Recommended for full desktop integration*:
+  ```bash
+  sudo dpkg -i Doit-linux-1.0.1.deb
+  ```
+  *Installs system-wide. The Doit logo and desktop entry are immediately added to your Application Launcher, Dock, and GNOME Dash with zero extra steps.*
+
+* **Universal AppImage**:
   ```bash
   chmod +x Doit-linux-1.0.1.AppImage
   ./Doit-linux-1.0.1.AppImage
   ```
-* **Debian / Ubuntu** (`.deb` package):
-  ```bash
-  sudo dpkg -i Doit-linux-1.0.1.deb
-  ```
+  *(Portable single-file execution across all distributions including Fedora, Arch, and openSUSE without root permissions).*
 
 ---
 

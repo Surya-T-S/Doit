@@ -18,7 +18,7 @@ function getStoragePath(): string {
 
 function createWindow(): void {
   const isMac = process.platform === 'darwin';
-  const iconPath = path.join(__dirname, '../public/logo.png');
+  const iconPath = app.isPackaged ? (fs.existsSync(path.join(process.resourcesPath, 'public/logo.png')) ? path.join(process.resourcesPath, 'public/logo.png') : path.join(__dirname, '../public/logo.png')) : path.join(__dirname, '../public/logo.png');
   const hasIcon = fs.existsSync(iconPath);
 
   mainWindow = new BrowserWindow({
@@ -101,7 +101,7 @@ app.whenReady().then(() => {
   setupStorageIPC();
 
   // Set macOS dock icon if available
-  const iconPath = path.join(__dirname, '../public/logo.png');
+  const iconPath = app.isPackaged ? (fs.existsSync(path.join(process.resourcesPath, 'public/logo.png')) ? path.join(process.resourcesPath, 'public/logo.png') : path.join(__dirname, '../public/logo.png')) : path.join(__dirname, '../public/logo.png');
   if (process.platform === 'darwin' && fs.existsSync(iconPath) && app.dock) {
     app.dock.setIcon(iconPath);
   }

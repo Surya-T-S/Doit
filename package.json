@@ -69,6 +69,8 @@
       ],
       "icon": "public/logo.png",
       "category": "Utility",
+      "desktopName": "doit.desktop",
+      "syncDesktopName": true,
       "artifactName": "${productName}-linux-${version}.${ext}"
     }
   },
