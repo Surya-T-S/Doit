@@ -6,7 +6,7 @@
   "description": "Minimal, distraction-free personal planning desktop application",
   "author": {
     "name": "Surya T S",
-    "email": "suryats202006@gmail.com"
+    "email": "contact.suryats@users.noreply.github.com"
   },
   "main": "dist-electron/main.cjs",
   "type": "module",
