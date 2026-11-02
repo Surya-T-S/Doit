@@ -49,6 +49,9 @@ jobs:
         run: npm ci
 
       - name: Build and package for ${{ matrix.platform }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
         run: ${{ matrix.build_cmd }}
 
       - name: Upload Platform Artifacts
