@@ -33,6 +33,9 @@ Grab the latest installer for your operating system from [**GitHub Releases**](h
 * **macOS**: `Doit-mac-1.0.1.dmg`
 * **Linux**: `Doit-linux-1.0.1.AppImage` or `.deb`
 
+> [!TIP]
+> **Important Setup**: Create a dedicated, standalone folder specifically for **Doit** (e.g. `C:\Users\<you>\Doit` or `~/Applications/Doit`) and run/install it there to keep your data, exports, and application files neatly organized in one place.
+
 ---
 
 ### Development
@@ -44,6 +47,4 @@ npm install
 npm run electron:dev
 ```
 
-<div align="center">
-<sub>Crafted with focus by Surya T S</sub>
-</div>
+
