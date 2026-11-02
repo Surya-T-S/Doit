@@ -2,8 +2,6 @@
 
 <img src="public/banner.png" alt="Doit Banner" width="100%" />
 
-# Doit
-
 **Less planning noise. More execution.**
 
 An offline-first, distraction-free desktop personal planner built for focus.
