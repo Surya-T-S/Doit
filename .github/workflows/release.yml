@@ -11,20 +11,29 @@ permissions:
 
 jobs:
   build:
-    name: Build ${{ matrix.os }}
+    name: Build ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: windows-latest
             platform: windows
-            artifact: release/windows/*
+            build_cmd: npm run release:win
+            artifact_dir: release
+            artifact_files: release/*.exe
           - os: macos-latest
             platform: macos
-            artifact: release/macos/*
+            build_cmd: npm run release:mac
+            artifact_dir: release
+            artifact_files: release/*.dmg
           - os: ubuntu-latest
             platform: linux
-            artifact: release/linux/*
+            build_cmd: npm run release:linux
+            artifact_dir: release
+            artifact_files: |
+              release/*.AppImage
+              release/*.deb
 
     steps:
       - name: Checkout repository
@@ -33,22 +42,24 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run build and release pipeline
-        run: npm run release
+      - name: Build and package for ${{ matrix.platform }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+        run: ${{ matrix.build_cmd }}
 
       - name: Upload Platform Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: doit-${{ matrix.platform }}-release
-          path: |
-            release/${{ matrix.platform }}/*
-            release/release-manifest.json
+          path: ${{ matrix.artifact_files }}
+          if-no-files-found: warn
 
   publish:
     name: Publish GitHub Release
@@ -58,12 +69,11 @@ jobs:
     steps:
       - name: Download all built artifacts
         uses: actions/download-artifact@v4
+        with:
+          path: all-artifacts
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            doit-windows-release/*
-            doit-macos-release/*
-            doit-linux-release/*
+          files: all-artifacts/**/*
           generate_release_notes: true

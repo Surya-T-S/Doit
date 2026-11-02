@@ -4,7 +4,10 @@
   "private": true,
   "version": "1.0.0",
   "description": "Minimal, distraction-free personal planning desktop application",
-  "author": "Surya T S",
+  "author": {
+    "name": "Surya T S",
+    "email": "suryats202006@gmail.com"
+  },
   "main": "dist-electron/main.cjs",
   "type": "module",
   "scripts": {
