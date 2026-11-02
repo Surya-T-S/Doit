@@ -49,8 +49,55 @@ Grab the latest version for your platform from [**GitHub Releases**](https://git
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Surya-T-S/Doit/main/scripts/install-linux.sh | bash
 ```
-*Installs Doit, registers the crisp 512×512 logo, and adds the launcher directly to your Application Menu, GNOME Dash, and Dock on any Linux distribution (Ubuntu, Fedora, Mint, Arch, etc.) with zero root/sudo required.*
+*Installs Doit, registers the logo, and adds the launcher to your Application Menu, GNOME Dash, and Dock on any Linux distribution (Ubuntu, Fedora, Mint, Arch, etc.) with zero root/sudo required.*
 
+What the script does:
+- Downloads the AppImage to `~/.local/share/doit/`
+- Creates a `doit` command in `~/.local/bin/` (make sure it is on your `PATH`)
+- Adds `doit.desktop` to `~/.local/share/applications/` and the icon to `~/.local/share/icons/`
+
+Launch it from your App Launcher, or run `doit` in a terminal. To update, simply run the install command again.
+
+**Manual alternative:** download `Doit-linux-1.0.1.AppImage` from Releases, then `chmod +x Doit-linux-1.0.1.AppImage && ./Doit-linux-1.0.1.AppImage`. A `.deb` package (`sudo apt install ./Doit-linux-1.0.1.deb`) is also available.
+
+---
+
+### Uninstall
+
+Your data is stored separately from the app, so uninstalling keeps it unless you choose to delete it.
+
+| OS | Data location |
+|----|---------------|
+| Windows | `%APPDATA%\Doit` |
+| macOS | `~/Library/Application Support/Doit` |
+| Linux | `~/.config/Doit` |
+
+> [!TIP]
+> Want to keep your tasks? Export a JSON/CSV backup from Settings before uninstalling.
+
+#### Windows
+1. Open the folder where you installed Doit (the dedicated Doit folder) and double-click **`Uninstall Doit.exe`**.
+   *(Alternatively: Settings → Apps → Installed apps → Doit → Uninstall.)*
+2. When asked *"Do you also want to completely delete all personal data?"*, choose **Yes** for a full wipe or **No** to keep your data.
+
+#### macOS
+1. Quit Doit, then drag **Doit** from `Applications` to the Trash.
+2. (Optional, deletes data) `rm -rf ~/Library/Application\ Support/Doit`
+
+#### Linux
+Installed with the quick-install script:
+```bash
+curl -fsSL https://raw.githubusercontent.com/Surya-T-S/Doit/main/scripts/uninstall-linux.sh | bash
+```
+To also delete your personal data, add `--purge`:
+```bash
+curl -fsSL https://raw.githubusercontent.com/Surya-T-S/Doit/main/scripts/uninstall-linux.sh | bash -s -- --purge
+```
+Installed via `.deb`: `sudo apt remove doit` (add `~/.config/Doit` removal to wipe data).
+
+> You can also wipe data from inside the app: **Settings → Danger Zone → Wipe All Data**.
+
+---
 
 ### Development
 
