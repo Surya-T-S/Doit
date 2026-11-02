@@ -2,7 +2,7 @@
   "name": "doit",
   "productName": "Doit",
   "private": true,
-  "version": "1.0.2",
+  "version": "1.0.1",
   "description": "Minimal, distraction-free personal planning desktop application",
   "author": {
     "name": "Surya T S",
