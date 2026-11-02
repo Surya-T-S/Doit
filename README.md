@@ -25,16 +25,34 @@ An offline-first, distraction-free desktop personal planner built for focus.
 
 ---
 
-### Download
+### Download & Installation
 
-Grab the latest installer for your operating system from [**GitHub Releases**](https://github.com/Surya-T-S/Doit/releases/latest):
+Grab the latest version for your platform from [**GitHub Releases**](https://github.com/Surya-T-S/Doit/releases/latest).
 
-* **Windows**: `Doit-Setup-1.0.1.exe`
-* **macOS**: `Doit-mac-1.0.1.dmg`
-* **Linux**: `Doit-linux-1.0.1.AppImage` or `.deb`
+> [!IMPORTANT]
+> **Mandatory Setup**: Create a dedicated folder specifically for **Doit** (e.g. `C:\Doit` or `~/Doit`) and move your installer/executable there before running. Do not run directly from your general Downloads folder.
 
-> [!TIP]
-> **Important Setup**: Create a dedicated, standalone folder specifically for **Doit** (e.g. `C:\Users\<you>\Doit` or `~/Applications/Doit`) and run/install it there to keep your data, exports, and application files neatly organized in one place.
+####  Windows
+1. Download `Doit-Setup-1.0.1.exe` into your dedicated Doit folder.
+2. Double-click the `.exe` and follow the setup wizard.
+3. Launch Doit from your Desktop or Start Menu.
+
+####  macOS
+1. Download `Doit-mac-1.0.1.dmg`.
+2. Open the `.dmg` file.
+3. Drag **Doit** into your `Applications` folder (or your dedicated Doit folder).
+4. Launch Doit from Spotlight or Launchpad.
+
+####  Linux
+* **AppImage** (Runs on any distribution):
+  ```bash
+  chmod +x Doit-linux-1.0.1.AppImage
+  ./Doit-linux-1.0.1.AppImage
+  ```
+* **Debian / Ubuntu** (`.deb` package):
+  ```bash
+  sudo dpkg -i Doit-linux-1.0.1.deb
+  ```
 
 ---
 
