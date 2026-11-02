@@ -4,6 +4,14 @@ import * as fs from 'fs';
 
 let mainWindow: BrowserWindow | null = null;
 
+// Linux: make the window class deterministic so the desktop environment can match the
+// running window to doit.desktop (otherwise the dock shows a generic gray gear icon).
+// X11 uses WM_CLASS (--class); Wayland uses the app_id derived from "desktopName" in package.json.
+// Both resolve to "doit", matching StartupWMClass=doit in the installed .desktop file.
+if (process.platform === 'linux') {
+  app.commandLine.appendSwitch('class', 'doit');
+}
+
 // Persistent database path on user's hard drive (cross-platform)
 // Windows: %APPDATA%\Doit\doit-data.json
 // macOS: ~/Library/Application Support/Doit/doit-data.json
